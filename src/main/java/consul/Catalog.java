@@ -7,11 +7,29 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class Catalog {
-    private Consul consul;
-
+public class Catalog extends ConsulChain {
     public Catalog(Consul consul) {
-        this.consul = consul;
+        super(consul);
+    }
+
+    public void register() {
+        throw new RuntimeException("Not yet implemented.");
+    }
+
+    public void deregister() {
+        throw new RuntimeException("Not yet implemented.");
+    }
+
+    public void datacenters() {
+        throw new RuntimeException("Not yet implemented.");
+    }
+
+    public void nodes() {
+        throw new RuntimeException("Not yet implemented.");
+    }
+
+    public void node(String name) {
+        throw new RuntimeException("Not yet implemented.");
     }
 
     public Service services()

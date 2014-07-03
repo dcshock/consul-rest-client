@@ -1,7 +1,11 @@
 package consul;
 import com.mashape.unirest.http.Unirest;
 
-
+/**
+ * Orchestrates access to Consul's http api.
+ * @author mconroy
+ *
+ */
 public class Consul {
     private String uri;
     private int port;
@@ -23,10 +27,18 @@ public class Consul {
         }
     }
 
+    /**
+     * Get the catalog from the consul node.
+     * @return - Catalog
+     */
     public Catalog catalog() {
         return new Catalog(this);
     }
 
+    /**
+     * Url is a combo of uri + ":" + port
+     * @return - Url
+     */
     String getUrl() {
         return uri + ":" + port;
     }
