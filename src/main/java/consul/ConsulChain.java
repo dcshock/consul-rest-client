@@ -4,6 +4,8 @@ public class ConsulChain {
     protected Consul consul;
 
     protected ConsulChain(Consul consul) {
+        if (consul == null)
+            throw new IllegalArgumentException("Consul object cannot be null");
         this.consul = consul;
     }
 

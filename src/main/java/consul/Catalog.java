@@ -7,29 +7,40 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Catalog extends ConsulChain {
+    static final String uri = "/v1/catalog/";
+
     public Catalog(Consul consul) {
         super(consul);
-    }
-
-    public void register() {
-        throw new RuntimeException("Not yet implemented.");
     }
 
     public void deregister() {
         throw new RuntimeException("Not yet implemented.");
     }
 
-    public void datacenters() {
-        throw new RuntimeException("Not yet implemented.");
+    public List<DataCenter> datacenters()
+      throws UnirestException {
+        final List<DataCenter> list = new ArrayList<DataCenter>();
+        final HttpResponse<JsonNode> resp = Unirest.get(consul.getUrl() + this.uri + "datacenters").asJson();
+
+        final JSONArray arr = resp.getBody().getArray();
+        for (int i = 0; i < arr.length(); i++) {
+            list.add(new DataCenter(consul, arr.getString(i)));
+        }
+
+        return list;
     }
 
-    public void nodes() {
-        throw new RuntimeException("Not yet implemented.");
-    }
-
-    public void node(String name) {
-        throw new RuntimeException("Not yet implemented.");
+    public DataCenter datacenter(String name)
+      throws UnirestException {
+        for (DataCenter dc : datacenters()) {
+            if (name.equals(dc.getName()))
+                return dc;
+        }
+        return null;
     }
 
     public Service services()

@@ -19,9 +19,10 @@ public class Consul {
       throws Exception {
         try {
             final Consul c = new Consul("http://localhost", 8500);
-            System.out.println(c.catalog().services());
-
-            System.out.println(c.catalog().service("mumble"));
+            System.out.println(c.catalog().datacenters());
+            System.out.println(c.catalog().datacenter("dc1"));
+            System.out.println(c.catalog().datacenter("dc1").nodes());
+            System.out.println(c.catalog().datacenter("dc1").nodes().get(0).register(new ServiceProvider("test1", "test", 8080, null)));
         } finally {
             Unirest.shutdown();
         }
