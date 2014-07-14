@@ -1,6 +1,6 @@
 organization := "consul"
 
-name := "Consul Java Rest Client Library"
+name := "rest-client"
 
 version := "0.1"
 
