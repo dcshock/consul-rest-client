@@ -1,7 +1,7 @@
 package consul;
 
 public class ConsulChain {
-    protected Consul consul;
+    private Consul consul;
 
     protected ConsulChain(Consul consul) {
         if (consul == null)

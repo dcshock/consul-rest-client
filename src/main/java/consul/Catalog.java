@@ -22,11 +22,11 @@ public class Catalog extends ConsulChain {
     public List<DataCenter> datacenters()
       throws UnirestException {
         final List<DataCenter> list = new ArrayList<DataCenter>();
-        final HttpResponse<JsonNode> resp = Unirest.get(consul.getUrl() + EndpointCategory.Catalog.getUri() + "datacenters").asJson();
+        final HttpResponse<JsonNode> resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "datacenters").asJson();
 
         final JSONArray arr = resp.getBody().getArray();
         for (int i = 0; i < arr.length(); i++) {
-            list.add(new DataCenter(consul, arr.getString(i)));
+            list.add(new DataCenter(consul(), arr.getString(i)));
         }
 
         return list;
@@ -73,6 +73,6 @@ public class Catalog extends ConsulChain {
 
     public Service service(String name)
       throws UnirestException {
-        return consul.service(EndpointCategory.Catalog, name);
+        return consul().service(EndpointCategory.Catalog, name);
     }
 }

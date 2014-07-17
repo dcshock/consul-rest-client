@@ -17,7 +17,7 @@ public class Agent extends ConsulChain {
 
     public Self self() throws UnirestException {
         final HttpResponse<JsonNode> resp =
-            Unirest.get(consul.getUrl() + EndpointCategory.Agent.getUri() + "self").asJson();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "self").asJson();
         final JSONObject member = resp.getBody().getObject().getJSONObject("Member");
         return new Self(member.getString("Addr"), member.getInt("Port"), member.getString("Name"));
     }
@@ -31,7 +31,7 @@ public class Agent extends ConsulChain {
         final Self self = self();
 
         final HttpResponse<JsonNode> resp =
-            Unirest.get(consul.getUrl() + EndpointCategory.Agent.getUri() + "services").asJson();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "services").asJson();
 
         final List<ServiceProvider> providers = new ArrayList<ServiceProvider>();
 
@@ -78,7 +78,7 @@ public class Agent extends ConsulChain {
         }
 
         final HttpResponse<String> resp =
-            Unirest.put(consul.getUrl() + EndpointCategory.Agent.getUri() + "service/register").body(service.toString()).asString();
+            Unirest.put(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/register").body(service.toString()).asString();
 
         return resp.getBody().toString();
     }

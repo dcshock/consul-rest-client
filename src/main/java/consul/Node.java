@@ -44,7 +44,7 @@ public class Node extends ConsulChain {
         obj.put("Service", service);
 
         final HttpResponse<String> resp =
-            Unirest.put(consul.getUrl() + EndpointCategory.Catalog.getUri() + "register").body(obj.toString()).asString();
+            Unirest.put(consul().getUrl() + EndpointCategory.Catalog.getUri() + "register").body(obj.toString()).asString();
 
         return resp.getBody().toString();
     }

@@ -26,12 +26,12 @@ public class DataCenter extends ConsulChain {
     public List<Node> nodes()
       throws UnirestException {
         final List<Node> nodes = new ArrayList<Node>();
-        final HttpResponse<JsonNode> resp = Unirest.get(consul.getUrl() + EndpointCategory.Catalog.getUri() + "nodes").asJson();
+        final HttpResponse<JsonNode> resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "nodes").asJson();
 
         final JSONArray arr = resp.getBody().getArray();
         for (int i = 0; i < arr.length(); i++) {
             final JSONObject obj = arr.getJSONObject(i);
-            nodes.add(new Node(consul, this, obj.getString("Node"), obj.getString("Address")));
+            nodes.add(new Node(consul(), this, obj.getString("Node"), obj.getString("Address")));
         }
 
         return nodes;

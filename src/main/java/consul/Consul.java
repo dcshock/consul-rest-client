@@ -27,10 +27,6 @@ public class Consul {
             System.out.println(c.catalog().services());
             for (Service s : c.catalog().services())
                 System.out.println(c.catalog().service(s.getName()));
-//            System.out.println(c.catalog().datacenter("dc1"));
-//            System.out.println(c.catalog().datacenter("dc1").nodes());
-//            System.out.println(c.catalog().datacenter("dc1").nodes().get(0).register(new ServiceProvider("test1", "test", 8080, null)));
-//            System.out.println(c.agent().register(new ServiceProvider("test1", "test", 8080, null)));
             System.out.println(c.agent().self());
             System.out.println(c.agent().services());
         } finally {
