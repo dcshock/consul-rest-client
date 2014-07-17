@@ -12,14 +12,12 @@ public class ServiceProvider {
     Integer port;
     String[] tags;
 
-    public ServiceProvider(String name) {
+    public ServiceProvider() {
 
     }
 
     public ServiceProvider(String id, String name, Integer port, String[] tags) {
         this.id = id;
-        this.address = address;
-        this.node = node;
         this.name = name;
         this.port = port;
         this.tags = tags;

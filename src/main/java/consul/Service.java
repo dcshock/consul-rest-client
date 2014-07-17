@@ -6,10 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Service extends ConsulChain {
+    private String name;
+    private String[] tags;
     private List<ServiceProvider> providers = new ArrayList<ServiceProvider>();
 
     Service(Consul consul) {
         super(consul);
+    }
+
+    Service(Consul consul, String name, String[] tags) {
+        this(consul);
+        this.name = name;
+        this.tags = tags;
     }
 
     void add(JSONObject obj) {
@@ -27,6 +35,14 @@ public class Service extends ConsulChain {
         }
 
         return null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String[] getTags() {
+        return tags;
     }
 
     @Override
