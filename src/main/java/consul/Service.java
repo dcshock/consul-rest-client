@@ -3,6 +3,7 @@ package consul;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Service extends ConsulChain {
@@ -47,6 +48,6 @@ public class Service extends ConsulChain {
 
     @Override
     public String toString() {
-        return "Service [providers=" + providers + "]";
+        return "Service [name=" + name + ", tags=" + Arrays.toString(tags) + ", providers=" + providers + "]";
     }
 }

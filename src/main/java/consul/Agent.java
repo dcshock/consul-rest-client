@@ -1,5 +1,7 @@
 package consul;
 
+import com.mashape.unirest.request.GetRequest;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -81,5 +83,10 @@ public class Agent extends ConsulChain {
             Unirest.put(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/register").body(service.toString()).asString();
 
         return resp.getBody().toString();
+    }
+
+    public void deregister(String serviceId) throws UnirestException {
+        final HttpResponse<String> resp =
+           Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
     }
 }

@@ -24,10 +24,13 @@ public class Consul {
     public static void main(String args[]) throws Exception {
         try {
             final Consul c = new Consul("http://localhost", 8500);
+            c.agent().register(new ServiceProvider("test1", "test", 8302, null));
             System.out.println(c.catalog().services());
             for (Service s : c.catalog().services())
                 System.out.println(c.catalog().service(s.getName()));
             System.out.println(c.agent().self());
+            System.out.println(c.agent().services());
+            c.agent().deregister("test1");
             System.out.println(c.agent().services());
         } finally {
             Unirest.shutdown();
