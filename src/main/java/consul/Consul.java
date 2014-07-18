@@ -25,12 +25,14 @@ public class Consul {
         try {
             final Consul c = new Consul("http://localhost", 8500);
             c.agent().register(new ServiceProvider("test1", "test", 8302, null));
+            c.agent().checkRegister(new AgentCheck("test2", "check", "These are some notes", "/usr/local/bin/check_mem.py", "10s", "15s"));
             System.out.println(c.catalog().services());
             for (Service s : c.catalog().services())
                 System.out.println(c.catalog().service(s.getName()));
             System.out.println(c.agent().self());
             System.out.println(c.agent().services());
             c.agent().deregister("test1");
+            c.agent().checkDeregister("test2");
             System.out.println(c.agent().services());
         } finally {
             Unirest.shutdown();
@@ -54,8 +56,6 @@ public class Consul {
     public Agent agent() {
         return new Agent(this);
     }
-
-
 
     /**
      * Call the service api of consul using the given endpoint.

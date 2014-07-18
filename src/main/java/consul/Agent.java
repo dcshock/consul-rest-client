@@ -89,4 +89,24 @@ public class Agent extends ConsulChain {
         final HttpResponse<String> resp =
            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
     }
+
+    public String checkRegister(AgentCheck check) throws UnirestException {
+        final JSONObject agentCheck = new JSONObject();
+        agentCheck.put("ID", check.getId());
+        agentCheck.put("Name", check.getName());
+        agentCheck.put("Notes", check.getNotes());
+        agentCheck.put("Script", check.getScript());
+        agentCheck.put("Interval", check.getInterval());
+        agentCheck.put("TTL", check.getTTL());
+
+        final HttpResponse<String> resp =
+            Unirest.put(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/register").body(agentCheck.toString()).asString();
+
+        return resp.getBody().toString();
+    }
+
+    public void checkDeregister(String checkId) throws UnirestException {
+        final HttpResponse<String> resp =
+           Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId).asString();
+    }
 }
