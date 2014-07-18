@@ -1,7 +1,5 @@
 package consul;
 
-import com.mashape.unirest.request.GetRequest;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
