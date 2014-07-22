@@ -85,7 +85,14 @@ public class Agent extends ConsulChain {
 
     public void deregister(String serviceId) throws UnirestException {
         final HttpResponse<String> resp =
-           Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
+    }
+
+    public String getChecks() throws UnirestException {
+        final HttpResponse<String> resp =
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "checks").asString();
+
+        return resp.getBody().toString();
     }
 
     public String checkRegister(AgentCheck check) throws UnirestException {
@@ -105,21 +112,21 @@ public class Agent extends ConsulChain {
 
     public void checkDeregister(String checkId) throws UnirestException {
         final HttpResponse<String> resp =
-           Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId).asString();
     }
 
     public void checkPass(String checkId) throws UnirestException {
         final HttpResponse<String> resp =
-           Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/pass/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/pass/" + checkId).asString();
     }
 
     public void checkWarn(String checkId) throws UnirestException {
         final HttpResponse<String> resp =
-           Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/warn/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/warn/" + checkId).asString();
     }
 
     public void checkFail(String checkId) throws UnirestException {
         final HttpResponse<String> resp =
-           Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/fail/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/fail/" + checkId).asString();
     }
 }
