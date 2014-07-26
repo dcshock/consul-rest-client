@@ -85,7 +85,8 @@ public class Agent extends ConsulChain {
 
     public void deregister(String serviceId) throws UnirestException {
         final HttpResponse<String> resp =
-            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId)
+                .asString();
     }
 
     public String getChecks() throws UnirestException {
