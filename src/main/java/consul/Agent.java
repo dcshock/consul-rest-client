@@ -105,14 +105,16 @@ public class Agent extends ConsulChain {
         agentCheck.put("TTL", check.getTTL());
 
         final HttpResponse<String> resp =
-            Unirest.put(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/register").body(agentCheck.toString()).asString();
+            Unirest.put(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/register")
+                .body(agentCheck.toString()).asString();
 
         return resp.getBody().toString();
     }
 
     public void checkDeregister(String checkId) throws UnirestException {
         final HttpResponse<String> resp =
-            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId)
+                .asString();
     }
 
     public void checkPass(String checkId) throws UnirestException {
