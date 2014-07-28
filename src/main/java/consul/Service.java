@@ -46,6 +46,10 @@ public class Service extends ConsulChain {
         return tags;
     }
 
+    public List<ServiceProvider> getProviders() {
+        return providers;
+    }
+
     @Override
     public String toString() {
         return "Service [name=" + name + ", tags=" + Arrays.toString(tags) + ", providers=" + providers + "]";

@@ -1,5 +1,7 @@
 package consul;
 
+import java.io.IOException;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -81,6 +83,14 @@ public class Consul {
         }
 
         return s;
+    }
+
+    public void shutdown() {
+        try {
+            Unirest.shutdown();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
