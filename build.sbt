@@ -1,6 +1,6 @@
 organization := "consul"
 
-name := "rest-client"
+name := "consul-rest-client"
 
 version := "0.1"
 
