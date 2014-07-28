@@ -1,12 +1,10 @@
 package consul;
 
-import org.apache.commons.codec.binary.Base64;
-
-import org.json.JSONObject;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.codec.binary.Base64;
 
 public class KeyValue extends ConsulChain {
 
