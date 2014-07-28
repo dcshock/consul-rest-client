@@ -35,9 +35,9 @@ public class Consul {
             c.agent().checkDeregister("test2");
             System.out.println(c.agent().services());
             final KeyValue kv = new KeyValue(c);
-            kv.setKeyValue("this", "that");
-            System.out.println(kv.getValue("this"));
-            kv.deleteKey("this");
+            kv.set("this", "that");
+            System.out.println(kv.get("this"));
+            kv.delete("this");
         } finally {
             Unirest.shutdown();
         }
