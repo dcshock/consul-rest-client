@@ -23,7 +23,7 @@ public class Node extends ConsulChain {
     }
 
     public String register(ServiceProvider provider)
-      throws UnirestException {
+      throws ConsulException {
         final JSONArray tags = new JSONArray();
         if (provider.getTags() != null) {
             tags.put(provider.getTags());
@@ -43,8 +43,12 @@ public class Node extends ConsulChain {
         obj.put("Address", this.address);
         obj.put("Service", service);
 
-        final HttpResponse<String> resp =
-            Unirest.put(consul().getUrl() + EndpointCategory.Catalog.getUri() + "register").body(obj.toString()).asString();
+        final HttpResponse<String> resp;
+        try {
+            resp = Unirest.put(consul().getUrl() + EndpointCategory.Catalog.getUri() + "register").body(obj.toString()).asString();
+        } catch (UnirestException e) {
+            throw new ConsulException(e);
+        }
 
         return resp.getBody().toString();
     }

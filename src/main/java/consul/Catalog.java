@@ -20,9 +20,14 @@ public class Catalog extends ConsulChain {
     }
 
     public List<DataCenter> datacenters()
-      throws UnirestException {
+      throws ConsulException {
         final List<DataCenter> list = new ArrayList<DataCenter>();
-        final HttpResponse<JsonNode> resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "datacenters").asJson();
+        final HttpResponse<JsonNode> resp;
+        try {
+            resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "datacenters").asJson();
+        } catch (UnirestException e) {
+            throw new ConsulException(e);
+        }
 
         final JSONArray arr = resp.getBody().getArray();
         for (int i = 0; i < arr.length(); i++) {
@@ -33,7 +38,7 @@ public class Catalog extends ConsulChain {
     }
 
     public DataCenter datacenter(String name)
-      throws UnirestException {
+      throws ConsulException {
         for (DataCenter dc : datacenters()) {
             if (name.equals(dc.getName()))
                 return dc;
@@ -46,12 +51,17 @@ public class Catalog extends ConsulChain {
      *
      * @param category
      * @return
-     * @throws UnirestException
+     * @throws ConsulException
      */
-    public List<Service> services() throws UnirestException {
+    public List<Service> services() throws ConsulException {
         final List<Service> services = new ArrayList<Service>();
 
-        final HttpResponse<JsonNode> resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "services").asJson();
+        final HttpResponse<JsonNode> resp;
+        try {
+            resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "services").asJson();
+        } catch (UnirestException e) {
+            throw new ConsulException(e);
+        }
 
         final JSONObject obj = resp.getBody().getObject();
 
@@ -72,7 +82,7 @@ public class Catalog extends ConsulChain {
     }
 
     public Service service(String name)
-      throws UnirestException {
+      throws ConsulException {
         return consul().service(EndpointCategory.Catalog, name);
     }
 }

@@ -69,11 +69,15 @@ public class Consul {
      * @param category
      * @param name
      * @return
-     * @throws UnirestException
+     * @throws ConsulException
      */
-    public Service service(EndpointCategory category, String name) throws UnirestException {
-        final HttpResponse<JsonNode> resp =
-            Unirest.get(this.getUrl() + category.getUri() + "service/{name}").routeParam("name", name).asJson();
+    public Service service(EndpointCategory category, String name) throws ConsulException {
+        final HttpResponse<JsonNode> resp;
+        try {
+            resp = Unirest.get(this.getUrl() + category.getUri() + "service/{name}").routeParam("name", name).asJson();
+        } catch (UnirestException e) {
+            throw new ConsulException(e);
+        }
 
         final Service s = new Service(this);
 
