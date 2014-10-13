@@ -81,6 +81,12 @@ public class Catalog extends ConsulChain {
         return services;
     }
 
+    /**
+     * Return the current status from any service check tied to the serviceName.
+     * @param serviceName
+     * @return
+     * @throws ConsulException
+     */
     public List<ServiceCheck> checks(String serviceName) throws ConsulException {
         final List<ServiceCheck> checks = new ArrayList<ServiceCheck>();
 
@@ -96,8 +102,6 @@ public class Catalog extends ConsulChain {
             final ServiceCheck s = new ServiceCheck(arr.getJSONObject(i));
             checks.add(s);
         }
-
-
 
         return checks;
     }
