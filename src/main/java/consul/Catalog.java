@@ -81,6 +81,27 @@ public class Catalog extends ConsulChain {
         return services;
     }
 
+    public List<ServiceCheck> checks(String serviceName) throws ConsulException {
+        final List<ServiceCheck> checks = new ArrayList<ServiceCheck>();
+
+        final HttpResponse<JsonNode> resp;
+        try {
+            resp = Unirest.get(consul().getUrl() + EndpointCategory.Check.getUri() + serviceName).asJson();
+        } catch (UnirestException e) {
+            throw new ConsulException(e);
+        }
+
+        final JSONArray arr = resp.getBody().getArray();
+        for (int i = 0; i < arr.length(); i++) {
+            final ServiceCheck s = new ServiceCheck(arr.getJSONObject(i));
+            checks.add(s);
+        }
+
+
+
+        return checks;
+    }
+
     public Service service(String name)
       throws ConsulException {
         return consul().service(EndpointCategory.Catalog, name);
