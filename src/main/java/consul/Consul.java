@@ -1,5 +1,7 @@
 package consul;
 
+import com.mashape.unirest.http.options.Options;
+
 import java.io.IOException;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -87,6 +89,14 @@ public class Consul {
         }
 
         return s;
+    }
+
+    /**
+     * With some frameworks it is necessary to refresh the unirest connection pool state
+     * during runtime. This method does just that.
+     */
+    public void startup() {
+        Options.refresh();
     }
 
     public void shutdown() {
