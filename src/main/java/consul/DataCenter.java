@@ -1,7 +1,6 @@
 package consul;
 
 import org.json.JSONObject;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -24,9 +23,14 @@ public class DataCenter extends ConsulChain {
     }
 
     public List<Node> nodes()
-      throws UnirestException {
+      throws ConsulException {
         final List<Node> nodes = new ArrayList<Node>();
-        final HttpResponse<JsonNode> resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "nodes").asJson();
+        final HttpResponse<JsonNode> resp;
+        try {
+            resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "nodes").asJson();
+        } catch (UnirestException e) {
+            throw new ConsulException(e);
+        }
 
         final JSONArray arr = resp.getBody().getArray();
         for (int i = 0; i < arr.length(); i++) {
@@ -38,7 +42,7 @@ public class DataCenter extends ConsulChain {
     }
 
     public Node node(String name)
-      throws UnirestException {
+      throws ConsulException {
         for (Node n : nodes()) {
             if (name.equals(n.getName())) {
                 return n;

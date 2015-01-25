@@ -11,6 +11,7 @@ public class ServiceProvider {
     String name;
     Integer port;
     String[] tags;
+    boolean critical;
 
     public ServiceProvider() {
 
@@ -85,9 +86,17 @@ public class ServiceProvider {
         this.tags = tags;
     }
 
+    public void setCritical(boolean critical) {
+        this.critical = critical;
+    }
+
+    public boolean isCritical() {
+        return critical;
+    }
+
     @Override
     public String toString() {
         return "ServiceProvider [id=" + id + ", address=" + address + ", node=" + node + ", name=" + name + ", port=" + port +
-                        ", tags=" + Arrays.toString(tags) + "]";
+                        ", tags=" + Arrays.toString(tags) + ", critical=" + critical + "]";
     }
 }

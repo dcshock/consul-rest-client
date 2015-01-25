@@ -1,8 +1,8 @@
 organization := "consul"
 
-name := "rest-client"
+name := "consul-rest-client"
 
-version := "0.1"
+version := "0.5"
 
 scalaVersion := "2.10.0"
 
@@ -17,10 +17,10 @@ conflictManager := ConflictManager.strict
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-q", "-n", "-a")
 
 libraryDependencies ++= Seq(
+  "com.mashape.unirest" % "unirest-java" % "1.3.27",
+  "com.google.code.gson" % "gson" % "2.2.3",
   "com.novocode" % "junit-interface" % "0.11-SOFI" % "test",
-  "org.mockito" % "mockito-all" % "1.9.5" % "test",
-  "com.mashape.unirest" % "unirest-java" % "1.3.20",
-  "com.google.code.gson" % "gson" % "2.2.3"
+  "org.mockito" % "mockito-all" % "1.9.5" % "test"
 )
 
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java

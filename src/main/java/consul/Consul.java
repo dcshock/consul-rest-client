@@ -1,5 +1,9 @@
 package consul;
 
+import com.mashape.unirest.http.options.Options;
+
+import java.io.IOException;
+
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -67,11 +71,15 @@ public class Consul {
      * @param category
      * @param name
      * @return
-     * @throws UnirestException
+     * @throws ConsulException
      */
-    public Service service(EndpointCategory category, String name) throws UnirestException {
-        final HttpResponse<JsonNode> resp =
-            Unirest.get(this.getUrl() + category.getUri() + "service/{name}").routeParam("name", name).asJson();
+    public Service service(EndpointCategory category, String name) throws ConsulException {
+        final HttpResponse<JsonNode> resp;
+        try {
+            resp = Unirest.get(this.getUrl() + category.getUri() + "service/{name}").routeParam("name", name).asJson();
+        } catch (UnirestException e) {
+            throw new ConsulException(e);
+        }
 
         final Service s = new Service(this);
 
@@ -81,6 +89,22 @@ public class Consul {
         }
 
         return s;
+    }
+
+    /**
+     * With some frameworks it is necessary to refresh the unirest connection pool state
+     * during runtime. This method does just that.
+     */
+    public void startup() {
+        Options.refresh();
+    }
+
+    public void shutdown() {
+        try {
+            Unirest.shutdown();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

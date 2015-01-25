@@ -2,6 +2,7 @@ package consul;
 
 public enum EndpointCategory {
     Catalog("/v1/catalog/"),
+    Check("/v1/health/checks/"),
     Agent("/v1/agent/"),
     KV("/v1/kv/");
 
