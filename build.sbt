@@ -60,4 +60,3 @@ pomExtra := (
     </developer>
   </developers>)
 
-pgpSecretRing := file("/Users/mconroy/.gnupg/secring.gpg")
