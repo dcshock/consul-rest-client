@@ -26,6 +26,7 @@ testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-q", "-n", "-a")
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
 
 crossPaths := false
+
 publishMavenStyle := true
 
 publishTo := {
