@@ -4,6 +4,18 @@ consul-rest-client
 Java REST client for Consul.io
 
 
-Don't use me just yet! Once there is a fully functional version one it'll be posted here. 
+Latest Version Available 0.5
 
-1/25/2015 - We'll be up on Maven Central soon. 
+## Maven Dependency
+```
+<dependency>
+  <groupId>com.github.dcshock</groupId>
+  <artifactId>consul-rest-client</artifactId>
+  <version>0.5</version>
+</dependency>
+```
+
+## SBT Dependency
+```
+"com.github.dcshock" % "consul-rest-client" % "0.5"
+```
