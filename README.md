@@ -85,3 +85,11 @@ In instances where a framework may shutdown loaded beans during hot deploys it i
 // This happens when the consul bean is first instantiated, but sometimes the Unirest rug can get pulled, and require a manual jump start. 
 consul.startup();
 ```
+
+# Release Notes
+
+### 0.6
+Updated build dependencies for SBT users. The project didn't require Scala, and it was causing issues with prior versions if it was included.
+
+### 0.5
+Initial release of the client.
