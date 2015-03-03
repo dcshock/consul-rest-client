@@ -2,9 +2,7 @@ organization := "com.github.dcshock"
 
 name := "consul-rest-client"
 
-version := "0.5"
-
-scalaVersion := "2.11.4"
+version := "0.6"
 
 libraryDependencies ++= Seq(
   "com.mashape.unirest" % "unirest-java" % "1.3.27",
@@ -24,6 +22,12 @@ conflictManager := ConflictManager.strict
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-q", "-n", "-a")
 
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
+
+// Inform sbt-eclipse to not add Scala nature
+EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
+
+// Remove scala dependency for pure Java libraries
+autoScalaLibrary := false
 
 crossPaths := false
 
