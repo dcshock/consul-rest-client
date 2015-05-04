@@ -74,7 +74,9 @@ public class Agent extends ConsulChain {
     public String register(ServiceProvider provider) throws ConsulException {
         final JSONArray tags = new JSONArray();
         if (provider.getTags() != null) {
-            tags.put(provider.getTags());
+			for (String tag : provider.getTags()) {
+				tags.put(tag);
+			}
         }
 
         final JSONObject service = new JSONObject();
