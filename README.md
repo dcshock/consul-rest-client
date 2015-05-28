@@ -5,20 +5,20 @@ Java REST client for Consul.io
 
 Welcome! Hopefully this helps someone get started using Consul from java applications. This code has been production tested at this point, but will remain beta release until all the Consul endpoints are implemented. Feel free to submit issues, or pull requests to contribute. 
 
-Latest Version Available 0.6
+Latest Version Available 0.7
 
 ## Maven Dependency
 ```
 <dependency>
   <groupId>com.github.dcshock</groupId>
   <artifactId>consul-rest-client</artifactId>
-  <version>0.6</version>
+  <version>0.7</version>
 </dependency>
 ```
 
 ## SBT Dependency
 ```
-"com.github.dcshock" % "consul-rest-client" % "0.6"
+"com.github.dcshock" % "consul-rest-client" % "0.7"
 ```
 
 ## Example Usage
