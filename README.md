@@ -88,6 +88,9 @@ consul.startup();
 
 # Release Notes
 
+### 0.7
+Fix invalid JSON array generation for tags.
+
 ### 0.6
 Updated build dependencies for SBT users. The project didn't require Scala, and it was causing issues with prior versions if it was included.
 
