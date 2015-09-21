@@ -1,5 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import consul.Consul;
 import consul.ConsulException;
@@ -16,7 +17,7 @@ public class SessionTest {
 
     @BeforeClass
     public static void before() {
-        s = new Consul("http://localhost", 8500).session();
+        s = new Consul("http://dev0", 8500).session();
     }
 
     @After
@@ -34,6 +35,13 @@ public class SessionTest {
     public void testCreate() throws Exception {
         String id = s.create("" + System.currentTimeMillis());
         assertNotNull(id);
+    }
+
+    @Test
+    public void testRenew() throws ConsulException {
+        final String id = s.create("" + System.currentTimeMillis());
+        assertNotNull(id);
+        assertTrue(s.info(id).get(0).renew());
     }
 
     @Test

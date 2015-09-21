@@ -48,6 +48,20 @@ public class Session extends ConsulChain {
         }
     }
 
+    public List<SessionData> renew(SessionData session) throws ConsulException {
+        try {
+            final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "renew/" + session.getId())
+                .asString();
+
+            if (resp.getStatus() != 200)
+                throw new ConsulException("Session lookup failed with status: " + resp.getStatus());
+
+            return tieSelf(mapper.readValue(resp.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, SessionData.class)));
+        } catch (UnirestException | IOException e) {
+            throw new ConsulException(e);
+        }
+    }
+
     public List<SessionData> info(String id) throws ConsulException {
         try {
             final HttpResponse<String> resp = Unirest.get(consul().getUrl() + EndpointCategory.Session.getUri() + "info/" + id)

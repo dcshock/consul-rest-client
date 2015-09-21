@@ -1,12 +1,23 @@
 package consul;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public class SessionData {
     public enum Behavior {
-        RELEASE,
-        DELETE
+        RELEASE("release"),
+        DELETE("delete");
+
+        private String type;
+
+        private Behavior(String type) {
+            this.type = type;
+        }
+
+        @JsonValue
+        public String getType() {
+            return type;
+        }
     }
 
     private Session sessionHandler;
@@ -20,11 +31,6 @@ public class SessionData {
     private String createIndex;
 
     SessionData() {
-    }
-
-    @JsonIgnore
-    public Session sessionHandler() {
-        return this.sessionHandler;
     }
 
     @JsonProperty("ID")
@@ -121,6 +127,21 @@ public class SessionData {
     }
 
     public boolean destroy() throws ConsulException {
-        return sessionHandler().destroy(this);
+        return sessionHandler.destroy(this);
+    }
+
+    public boolean renew()  throws ConsulException {
+        final SessionData newData = sessionHandler.renew(this).get(0);
+
+        this.setBehavior(newData.getBehavior())
+            .setChecks(newData.getChecks())
+            .setCreateIndex(newData.getCreateIndex())
+            .setId(newData.getId())
+            .setLockDelay(newData.getLockDelay())
+            .setName(newData.getName())
+            .setNode(newData.getNode())
+            .setTtl(newData.getTtl());
+
+        return true;
     }
 }
