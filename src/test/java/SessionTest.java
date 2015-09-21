@@ -17,7 +17,7 @@ public class SessionTest {
 
     @BeforeClass
     public static void before() {
-        s = new Consul("http://dev0", 8500).session();
+        s = new Consul("http://localhost", 8500).session();
     }
 
     @After
