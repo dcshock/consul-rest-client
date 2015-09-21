@@ -2,7 +2,7 @@ organization := "com.github.dcshock"
 
 name := "consul-rest-client"
 
-version := "0.7"
+version := "0.8"
 
 libraryDependencies ++= Seq(
   "com.mashape.unirest" % "unirest-java" % "1.3.27",
