@@ -1,14 +1,13 @@
 package consul;
 
-import com.mashape.unirest.http.options.Options;
-
-import java.io.IOException;
-
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.http.options.Options;
 import org.json.JSONArray;
+
+import java.io.IOException;
 
 /**
  * Orchestrates access to Consul's http api.
@@ -63,6 +62,10 @@ public class Consul {
      */
     public Agent agent() {
         return new Agent(this);
+    }
+
+    public Session session() {
+        return new Session(this);
     }
 
     /**

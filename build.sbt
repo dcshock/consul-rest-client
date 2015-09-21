@@ -6,7 +6,8 @@ version := "0.7"
 
 libraryDependencies ++= Seq(
   "com.mashape.unirest" % "unirest-java" % "1.3.27",
-  "com.google.code.gson" % "gson" % "2.2.3",
+  "com.fasterxml.jackson.core" % "jackson-core" % "2.6.2",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.2",
   "com.novocode" % "junit-interface" % "0.10" % "test",
   "org.mockito" % "mockito-all" % "1.9.5" % "test"
 )
@@ -64,3 +65,4 @@ pomExtra := (
     </developer>
   </developers>)
 
+usePgpKeyHex("4E8CE1EFE9D49D46")
