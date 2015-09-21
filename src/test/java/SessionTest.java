@@ -37,7 +37,7 @@ public class SessionTest {
         String id = s.create("" + System.currentTimeMillis());
         assertNotNull(id);
 
-        SessionData data = s.info(id).get(0);
+        SessionData data = s.info(id);
         assertEquals("15000000000", data.getLockDelay());
         assertEquals("0s", data.getTtl());
         assertEquals(1, data.getChecks().length);
@@ -46,7 +46,7 @@ public class SessionTest {
         assertTrue(data.destroy());
 
         id = s.create("" + System.currentTimeMillis(), 12, Behavior.DELETE, 0);
-        data = s.info(id).get(0);
+        data = s.info(id);
         assertEquals("12000000000", data.getLockDelay());
         assertEquals("0s", data.getTtl());
         assertEquals(1, data.getChecks().length);
@@ -59,7 +59,7 @@ public class SessionTest {
     public void testRenew() throws ConsulException {
         final String id = s.create("" + System.currentTimeMillis());
         assertNotNull(id);
-        assertTrue(s.info(id).get(0).renew());
+        assertTrue(s.info(id).renew());
     }
 
     @Test
@@ -75,15 +75,20 @@ public class SessionTest {
     public void testInfo() throws ConsulException {
         final String id = s.create("" + System.currentTimeMillis());
 
-        final List<SessionData> sessionInfos = s.info(id);
-        assertEquals(1, sessionInfos.size());
-        assertEquals(id, sessionInfos.get(0).getId());
+        final SessionData data = s.info(id);
+        assertNotNull(data);
+        assertEquals(id, data.getId());
+        assertEquals("15000000000", data.getLockDelay());
+        assertEquals("0s", data.getTtl());
+        assertEquals(1, data.getChecks().length);
+        assertEquals("serfHealth", data.getChecks()[0]);
+        assertEquals(Behavior.RELEASE, data.getBehavior());
     }
 
     @Test
     public void testNode() throws ConsulException {
         final String id = s.create("" + System.currentTimeMillis());
-        final String node = s.info(id).get(0).getNode();
+        final String node = s.info(id).getNode();
 
         final List<SessionData> nodeSessions = s.node(node);
         assertEquals(1, nodeSessions.size());
