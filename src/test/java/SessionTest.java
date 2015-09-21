@@ -6,6 +6,7 @@ import consul.Consul;
 import consul.ConsulException;
 import consul.Session;
 import consul.SessionData;
+import consul.SessionData.Behavior;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,6 +36,23 @@ public class SessionTest {
     public void testCreate() throws Exception {
         String id = s.create("" + System.currentTimeMillis());
         assertNotNull(id);
+
+        SessionData data = s.info(id).get(0);
+        assertEquals("15000000000", data.getLockDelay());
+        assertEquals("0s", data.getTtl());
+        assertEquals(1, data.getChecks().length);
+        assertEquals("serfHealth", data.getChecks()[0]);
+        assertEquals(Behavior.RELEASE, data.getBehavior());
+        assertTrue(data.destroy());
+
+        id = s.create("" + System.currentTimeMillis(), 12, Behavior.DELETE, 0);
+        data = s.info(id).get(0);
+        assertEquals("12000000000", data.getLockDelay());
+        assertEquals("0s", data.getTtl());
+        assertEquals(1, data.getChecks().length);
+        assertEquals("serfHealth", data.getChecks()[0]);
+        assertEquals(Behavior.DELETE, data.getBehavior());
+        assertTrue(data.destroy());
     }
 
     @Test

@@ -22,12 +22,12 @@ public class SessionData {
 
     private Session sessionHandler;
     private String id;
-    private String lockDelay = "15s";
+    private String lockDelay;
     private String name;
     private String node;
     private String[] checks;
-    private Behavior behavior = Behavior.RELEASE;
-    private String ttl = "0s";
+    private Behavior behavior;
+    private String ttl;
     private String createIndex;
 
     SessionData() {
@@ -126,10 +126,20 @@ public class SessionData {
         return this;
     }
 
+    /**
+     * Destroy the session in consul.
+     * @return
+     * @throws ConsulException
+     */
     public boolean destroy() throws ConsulException {
         return sessionHandler.destroy(this);
     }
 
+    /**
+     * Renew the session in consul. This works with 0.5.2 and above.
+     * @return
+     * @throws ConsulException
+     */
     public boolean renew()  throws ConsulException {
         final SessionData newData = sessionHandler.renew(this).get(0);
 

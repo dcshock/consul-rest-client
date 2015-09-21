@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import consul.SessionData.Behavior;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,20 +17,24 @@ public class Session extends ConsulChain {
     }
 
     public String create(String name) throws ConsulException {
+        return create(name, 15, Behavior.RELEASE, 0);
+    }
+
+    public String create(String name, int lockDelay, Behavior behavior, int ttl) throws ConsulException {
         try {
             final String createStr = mapper.writeValueAsString(new SessionData()
                 .setName(name)
-                .setLockDelay("15s")
+                .setLockDelay(lockDelay + "s")
                 .setChecks("serfHealth")
-                .setBehavior(SessionData.Behavior.RELEASE)
-                .setTtl("0s"));
+                .setBehavior(behavior)
+                .setTtl(ttl + "s"));
 
             final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "create")
                 .body(createStr)
                 .asString();
 
             if (resp.getStatus() != 200)
-                throw new ConsulException("Unable to create session");
+                throw new ConsulException("Unable to create session: " + resp.getStatusText());
 
             return mapper.readValue(resp.getBody(), SessionData.class).getId();
         } catch (UnirestException | IOException e) {
