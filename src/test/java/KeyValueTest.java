@@ -110,6 +110,7 @@ public class KeyValueTest {
         String id2 = s.create("" + System.currentTimeMillis(), 1, Behavior.RELEASE, 10);
         assertTrue(kv.acquireLock("key2", "value", id2));
 
+        // Consul doesn't guarantee a ttl to the second so we have to wait longer than 10...
         Thread.sleep(22000);
 
         // Verify that the key was cleared.
