@@ -78,6 +78,7 @@ boolean destroyed = consul.session().info(sessionId).destroy();
 
 // Renew a session
 consul.session().info(sessionId).renew();
+```
 
 ## Accessing Key Value Storage
 ```java
