@@ -5,20 +5,20 @@ Java REST client for Consul.io
 
 Welcome! Hopefully this helps someone get started using Consul from java applications. This code has been production tested at this point, but will remain beta release until all the Consul endpoints are implemented. Feel free to submit issues, or pull requests to contribute. 
 
-Latest Version Available 0.7
+Latest Version Available 0.8
 
 ## Maven Dependency
 ```
 <dependency>
   <groupId>com.github.dcshock</groupId>
   <artifactId>consul-rest-client</artifactId>
-  <version>0.7</version>
+  <version>0.8</version>
 </dependency>
 ```
 
 ## SBT Dependency
 ```
-"com.github.dcshock" % "consul-rest-client" % "0.7"
+"com.github.dcshock" % "consul-rest-client" % "0.8"
 ```
 
 ## Example Usage
@@ -59,17 +59,43 @@ consul.agent().deregister("id");
 consul.agent().checkRegister(new AgentCheck("id", "checkid", "These are some notes", "/usr/local/bin/check_mem.py", "10s", "15s"));
 ```
 
+## Sessions
+```java
+Consul consul = new Consul("http://localhost", 8500);
+
+// Create a session - defaults to release bahavior, 15 second lock delay, and a indefinite ttl.
+String sessionId = consul.session().create("name");
+
+// Create a session with a specific setup.
+// 30 second lock delay
+// DELETE behavior - Keys locked by this session will be deleted after the session is destroyed.
+// RELEASE behavior - Keys locked by this session will be retained after the session is destroyed, but the session lock will be removed.
+// 10 second ttl
+String sessionId = consul.session().create("name", 30, Behavior.DELETE, 10); 
+
+// Destroy a session
+boolean destroyed = consul.session().info(sessionId).destroy();
+
+// Renew a session
+consul.session().info(sessionId).renew();
+
 ## Accessing Key Value Storage
 ```java
 Consul consul = new Consul("http://localhost", 8500);
 
-KeyValue kv = new KeyValue(consul);
+KeyValue kv = consul.keyStore();
 
 // Set a value
 kv.set("key", "value");
 
 // Get a value
 kv.get("key");
+
+// Acquire a lock with a session.
+boolean acquired = kv.acquire("key", "value", "sessionId");
+
+// Release a lock.
+boolean released = kv.release("key", "value", "sessionId");
 ```
 
 ## Dependency Notes
