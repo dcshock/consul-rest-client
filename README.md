@@ -115,6 +115,9 @@ consul.startup();
 
 # Release Notes
 
+### 0.8 
+Session handling and key/value locks.
+
 ### 0.7
 Fix invalid JSON array generation for tags.
 
