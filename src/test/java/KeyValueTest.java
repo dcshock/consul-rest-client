@@ -93,4 +93,29 @@ public class KeyValueTest {
         // Verify that the key was cleared.
         assertEquals("", kv.get("key"));
     }
+
+    @Test
+    public void testMultiAcquisition() throws Exception {
+        String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 0);
+        assertTrue(kv.acquireLock("key", "value", id));
+        assertTrue(kv.acquireLock("key", "value", id));
+        assertTrue(kv.releaseLock("key", "value", id));
+    }
+
+    @Test
+    public void testTtl() throws Exception {
+        String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 10);
+        assertTrue(kv.acquireLock("key", "value", id));
+
+        String id2 = s.create("" + System.currentTimeMillis(), 1, Behavior.RELEASE, 10);
+        assertTrue(kv.acquireLock("key2", "value", id2));
+
+        Thread.sleep(22000);
+
+        // Verify that the key was cleared.
+        assertEquals("", kv.getDetails("key").getSessionId());
+        assertEquals("", kv.get("key"));
+        assertEquals("", kv.getDetails("key2").getSessionId());
+        assertEquals("value", kv.get("key2"));
+    }
 }

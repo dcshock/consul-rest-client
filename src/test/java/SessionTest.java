@@ -45,10 +45,10 @@ public class SessionTest {
         assertEquals(Behavior.RELEASE, data.getBehavior());
         assertTrue(data.destroy());
 
-        id = s.create("" + System.currentTimeMillis(), 12, Behavior.DELETE, 0);
+        id = s.create("" + System.currentTimeMillis(), 12, Behavior.DELETE, 60);
         data = s.info(id);
         assertEquals("12000000000", data.getLockDelay());
-        assertEquals("0s", data.getTtl());
+        assertEquals("60s", data.getTtl());
         assertEquals(1, data.getChecks().length);
         assertEquals("serfHealth", data.getChecks()[0]);
         assertEquals(Behavior.DELETE, data.getBehavior());

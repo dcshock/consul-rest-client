@@ -26,6 +26,13 @@ public class KeyValue extends ConsulChain {
     }
 
     public String get(String key) throws ConsulException {
+        final KV keyValue = getDetails(key);
+        byte[] valueDecoded= Base64.decodeBase64(keyValue.getValue() );
+
+        return new String(valueDecoded);
+    }
+
+    public KV getDetails(String key) throws ConsulException {
         final HttpResponse<JsonNode> resp;
         try {
             resp = Unirest.get(consul().getUrl() + EndpointCategory.KV.getUri() + key).asJson();
@@ -33,10 +40,7 @@ public class KeyValue extends ConsulChain {
             throw new ConsulException(e);
         }
 
-        KV keyValue = new KV(resp.getBody().getArray().getJSONObject(0));
-        byte[] valueDecoded= Base64.decodeBase64(keyValue.getValue() );
-
-        return new String(valueDecoded);
+        return new KV(resp.getBody().getArray().getJSONObject(0));
     }
 
     public boolean delete(String key) throws ConsulException {
@@ -60,6 +64,11 @@ public class KeyValue extends ConsulChain {
 
     private boolean lock(String key, String value, String sessionId, String type) throws ConsulException {
         try {
+            // Allow the lock to be acquired multiple times.
+            final KV kv = getDetails(key);
+            if (type.equals("acquire") && kv.getSessionId() != null && !kv.getSessionId().equals(""))
+                return kv.getSessionId().equals(sessionId);
+
             final HttpResponse<String> resp =
                 Unirest.put(consul().getUrl() + EndpointCategory.KV.getUri() + key + "?" + type + "=" + sessionId).body(value).asString();
 
