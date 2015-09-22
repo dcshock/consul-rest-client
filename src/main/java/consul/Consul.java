@@ -68,6 +68,10 @@ public class Consul {
         return new Session(this);
     }
 
+    public KeyValue keyStore() {
+        return new KeyValue(this);
+    }
+
     /**
      * Call the service api of consul using the given endpoint.
      *

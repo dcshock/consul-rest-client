@@ -1,6 +1,5 @@
 package consul;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -10,8 +9,6 @@ import java.io.IOException;
 import java.util.List;
 
 public class Session extends ConsulChain {
-    private static ObjectMapper mapper = new ObjectMapper();
-
     Session(Consul consul) {
         super(consul);
     }

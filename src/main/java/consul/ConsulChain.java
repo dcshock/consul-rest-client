@@ -1,6 +1,9 @@
 package consul;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class ConsulChain {
+    protected static ObjectMapper mapper = new ObjectMapper();
     private Consul consul;
 
     protected ConsulChain(Consul consul) {

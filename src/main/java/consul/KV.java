@@ -9,19 +9,21 @@ public class KV {
     String key;
     Integer flags;
     String value;
+    String sessionId;
 
     public KV() {
 
     }
 
     public KV(Integer createIndex, Integer modifyIndex, Integer lockIndex, String key,
-                    Integer flags, String value) {
+                    Integer flags, String value, String sessionId) {
         this.createIndex = createIndex;
         this.modifyIndex = modifyIndex;
         this.lockIndex = lockIndex;
         this.key = key;
         this.flags = flags;
         this.value = value;
+        this.sessionId = sessionId;
     }
 
     KV(JSONObject obj) {
@@ -31,6 +33,7 @@ public class KV {
         this.key = obj.optString("Key");
         this.flags = obj.optInt("Flags");
         this.value = obj.optString("Value");
+        this.sessionId = obj.optString("Session");
     }
 
     public Integer getCreateIndex() {
@@ -51,6 +54,10 @@ public class KV {
 
     public Integer getLockIndex() {
         return lockIndex;
+    }
+
+    public String getSessionId() {
+        return sessionId;
     }
 
     public void setLockIndex(Integer lockIndex) {
@@ -81,9 +88,13 @@ public class KV {
         this.value = value;
     }
 
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
     @Override
     public String toString() {
         return "KV [createIndex=" + createIndex + ", modifyIndex=" + modifyIndex + ", lockIndex=" + lockIndex + ", key=" + key +
-                        ", flags=" + flags + ", value=" + value + "]";
+                        ", flags=" + flags + ", value=" + value + ", sessionId=" + sessionId + "]";
     }
 }
