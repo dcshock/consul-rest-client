@@ -22,8 +22,6 @@ conflictManager := ConflictManager.strict
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-q", "-n", "-a")
 
-EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
-
 // Inform sbt-eclipse to not add Scala nature
 EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
 
