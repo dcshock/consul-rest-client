@@ -1,7 +1,9 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import consul.Consul;
 import consul.ConsulException;
@@ -49,6 +51,58 @@ public class KeyValueTest {
         assertFalse(kv.acquireLock("key", "value", id2));
 
         assertTrue(kv.releaseLock("key", "value", id));
+    }
+
+    @Test
+    public void testAcquireAllNullOrBlank() {
+        try {
+            String id = s.create("" + System.currentTimeMillis());
+            assertNotNull(id);
+            assertFalse(kv.acquireLock(null, null, null));
+            assertFalse(kv.acquireLock("", "", ""));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testAcquireAllNullOrBlank:" + e);
+        }
+    }
+
+    @Test
+    public void testAcquireNullOrBlankSession() {
+        try {
+            String id = s.create("" + System.currentTimeMillis());
+            assertNotNull(id);
+            assertFalse(kv.acquireLock("key", "value", null));
+            assertFalse(kv.acquireLock("key", "value", ""));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testAcquireNullOrBlankSession:" + e);
+        }
+    }
+
+    @Test
+    public void testAcquireNullOrBlankKey() {
+        try {
+            String id = s.create("" + System.currentTimeMillis());
+            assertNotNull(id);
+            assertFalse(kv.acquireLock(null, "value", id));
+            assertFalse(kv.acquireLock("", "value", id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testAcquireNullOrBlankKey:" + e);
+        }
+    }
+
+    @Test
+    public void testAcquireNullOrBlankValue() {
+        try {
+            String id = s.create("" + System.currentTimeMillis());
+            assertNotNull(id);
+            assertFalse(kv.acquireLock("key", null, id));
+            assertFalse(kv.acquireLock("key", "", id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testAcquireNullOrBlankValue:" + e);
+        }
     }
 
     /**
@@ -118,5 +172,8 @@ public class KeyValueTest {
         assertEquals("", kv.get("key"));
         assertEquals("", kv.getDetails("key2").getSessionId());
         assertEquals("value", kv.get("key2"));
+
+        // Finally, the session no longer exists
+        assertNull(s.info(id));
     }
 }

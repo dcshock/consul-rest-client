@@ -1,6 +1,8 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import consul.Consul;
 import consul.ConsulException;
@@ -53,6 +55,28 @@ public class SessionTest {
         assertEquals("serfHealth", data.getChecks()[0]);
         assertEquals(Behavior.DELETE, data.getBehavior());
         assertTrue(data.destroy());
+    }
+
+    @Test
+    public void testGetInfoRandomSession() {
+        try {
+            String id = "" + System.currentTimeMillis();
+            assertNull(s.info(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testGetInfoRandomSession:" + e);
+        }
+    }
+
+    @Test
+    public void testGetInfoNullOrBlankSession() {
+        try {
+            assertNull(s.info(null));
+            assertNull(s.info(""));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testGetInfoNullOrBlankSession:" + e);
+        }
     }
 
     @Test
