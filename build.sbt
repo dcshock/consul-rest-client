@@ -62,5 +62,3 @@ pomExtra := (
       <url>http://www.mattconroy.com</url>
     </developer>
   </developers>)
-
-usePgpKeyHex("4E8CE1EFE9D49D46")
