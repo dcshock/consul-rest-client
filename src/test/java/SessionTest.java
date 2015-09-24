@@ -64,7 +64,7 @@ public class SessionTest {
 
     @Test
     public void testAll() throws ConsulException {
-        final String id  = s.create("" + System.currentTimeMillis());
+        final String id = s.create("" + System.currentTimeMillis());
 
         final List<SessionData> sessions = s.all();
         assertEquals(1, sessions.size());

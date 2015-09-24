@@ -27,7 +27,7 @@ public class KeyValue extends ConsulChain {
 
     public String get(String key) throws ConsulException {
         final KV keyValue = getDetails(key);
-        byte[] valueDecoded= Base64.decodeBase64(keyValue.getValue() );
+        byte[] valueDecoded = Base64.decodeBase64(keyValue.getValue());
 
         return new String(valueDecoded);
     }
