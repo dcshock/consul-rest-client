@@ -1,6 +1,8 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import consul.Consul;
 import consul.ConsulException;
@@ -56,6 +58,28 @@ public class SessionTest {
     }
 
     @Test
+    public void testGetInfoRandomSession() {
+        try {
+            String id = "" + System.currentTimeMillis();
+            assertNull(s.info(id));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testGetInfoRandomSession:" + e);
+        }
+    }
+
+    @Test
+    public void testGetInfoNullOrBlankSession() {
+        try {
+            assertNull(s.info(null));
+            assertNull(s.info(""));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testGetInfoNullOrBlankSession:" + e);
+        }
+    }
+
+    @Test
     public void testRenew() throws ConsulException {
         final String id = s.create("" + System.currentTimeMillis());
         assertNotNull(id);
@@ -64,7 +88,7 @@ public class SessionTest {
 
     @Test
     public void testAll() throws ConsulException {
-        final String id  = s.create("" + System.currentTimeMillis());
+        final String id = s.create("" + System.currentTimeMillis());
 
         final List<SessionData> sessions = s.all();
         assertEquals(1, sessions.size());

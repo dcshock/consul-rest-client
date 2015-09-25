@@ -15,6 +15,10 @@ public class KeyValue extends ConsulChain {
     }
 
     public boolean set(String key, String value) throws ConsulException {
+        // Give garbage, get garbage
+        if (key == null || key.trim().length() == 0)
+            return false;
+
         try {
             final HttpResponse<String> resp =
                 Unirest.put(consul().getUrl() + EndpointCategory.KV.getUri() + key).body(value).asString();
@@ -26,13 +30,21 @@ public class KeyValue extends ConsulChain {
     }
 
     public String get(String key) throws ConsulException {
+        // Give garbage, get garbage
+        if (key == null || key.trim().length() == 0)
+            return null;
+
         final KV keyValue = getDetails(key);
-        byte[] valueDecoded= Base64.decodeBase64(keyValue.getValue() );
+        byte[] valueDecoded = Base64.decodeBase64(keyValue.getValue());
 
         return new String(valueDecoded);
     }
 
     public KV getDetails(String key) throws ConsulException {
+        // Give garbage, get garbage
+        if (key == null || key.trim().length() == 0)
+            return null;
+
         final HttpResponse<JsonNode> resp;
         try {
             resp = Unirest.get(consul().getUrl() + EndpointCategory.KV.getUri() + key).asJson();
@@ -44,6 +56,10 @@ public class KeyValue extends ConsulChain {
     }
 
     public boolean delete(String key) throws ConsulException {
+        // Give garbage, get garbage
+        if (key == null || key.trim().length() == 0)
+            return false;
+
         try {
             final HttpResponse<String> resp =
                 Unirest.delete(consul().getUrl() + EndpointCategory.KV.getUri() + key).asString();
@@ -63,6 +79,12 @@ public class KeyValue extends ConsulChain {
     }
 
     private boolean lock(String key, String value, String sessionId, String type) throws ConsulException {
+        // Give garbage, get garbage
+        if (key == null || key.trim().length() == 0 ||
+            value == null || value.trim().length() == 0 ||
+            sessionId == null || sessionId.trim().length() == 0)
+            return false;
+
         try {
             // Allow the lock to be acquired multiple times.
             final KV kv = getDetails(key);

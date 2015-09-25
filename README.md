@@ -70,7 +70,7 @@ String sessionId = consul.session().create("name");
 // 30 second lock delay
 // DELETE behavior - Keys locked by this session will be deleted after the session is destroyed.
 // RELEASE behavior - Keys locked by this session will be retained after the session is destroyed, but the session lock will be removed.
-// 10 second ttl
+// 10 second ttl (minimum, timeout may occur much later)
 String sessionId = consul.session().create("name", 30, Behavior.DELETE, 10); 
 
 // Destroy a session

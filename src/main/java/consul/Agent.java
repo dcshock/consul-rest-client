@@ -74,9 +74,9 @@ public class Agent extends ConsulChain {
     public String register(ServiceProvider provider) throws ConsulException {
         final JSONArray tags = new JSONArray();
         if (provider.getTags() != null) {
-			for (String tag : provider.getTags()) {
-				tags.put(tag);
-			}
+            for (String tag : provider.getTags()) {
+                tags.put(tag);
+            }
         }
 
         final JSONObject service = new JSONObject();
@@ -100,8 +100,7 @@ public class Agent extends ConsulChain {
 
     public void deregister(String serviceId) throws ConsulException {
         try {
-            final HttpResponse<String> resp =
-                Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
         } catch (UnirestException e) {
             throw new ConsulException(e);
         }
@@ -140,9 +139,7 @@ public class Agent extends ConsulChain {
 
     public void checkDeregister(String checkId) throws ConsulException {
         try {
-            final HttpResponse<String> resp =
-                Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId)
-                    .asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId).asString();
         } catch (UnirestException e) {
             throw new ConsulException(e);
         }
@@ -150,8 +147,7 @@ public class Agent extends ConsulChain {
 
     public void checkPass(String checkId) throws ConsulException {
         try {
-            final HttpResponse<String> resp =
-                Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/pass/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/pass/" + checkId).asString();
         } catch (UnirestException e) {
             throw new ConsulException(e);
         }
@@ -159,8 +155,7 @@ public class Agent extends ConsulChain {
 
     public void checkWarn(String checkId) throws ConsulException {
         try {
-            final HttpResponse<String> resp =
-                Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/warn/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/warn/" + checkId).asString();
         } catch (UnirestException e) {
             throw new ConsulException(e);
         }
@@ -168,8 +163,7 @@ public class Agent extends ConsulChain {
 
     public void checkFail(String checkId) throws ConsulException {
         try {
-            final HttpResponse<String> resp =
-                Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/fail/" + checkId).asString();
+            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/fail/" + checkId).asString();
         } catch (UnirestException e) {
             throw new ConsulException(e);
         }

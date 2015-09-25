@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.List;
 
 public class Session extends ConsulChain {
+    // This is a consul limitation
+    public static final int MIN_TTL_SEC = 10;
+
     Session(Consul consul) {
         super(consul);
     }
@@ -18,6 +21,9 @@ public class Session extends ConsulChain {
     }
 
     public String create(String name, int lockDelay, Behavior behavior, int ttl) throws ConsulException {
+        if (name == null || name.trim().length() == 0 || lockDelay < 0 || (ttl < MIN_TTL_SEC && ttl != 0))
+            return null;
+
         try {
             final String createStr = mapper.writeValueAsString(new SessionData()
                 .setName(name)
@@ -40,6 +46,10 @@ public class Session extends ConsulChain {
     }
 
     public boolean destroy(SessionData session) throws ConsulException {
+        // Give garbage, get garbage
+        if (session == null)
+            return false;
+
         try {
             final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "destroy/" + session.getId())
                 .asString();
@@ -51,6 +61,10 @@ public class Session extends ConsulChain {
     }
 
     public List<SessionData> renew(SessionData session) throws ConsulException {
+        // Give garbage, get garbage
+        if (session == null)
+            return null;
+
         try {
             final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "renew/" + session.getId())
                 .asString();
@@ -65,6 +79,10 @@ public class Session extends ConsulChain {
     }
 
     public SessionData info(String id) throws ConsulException {
+        // Give garbage, get garbage
+        if (id == null || id.trim().length() == 0)
+            return null;
+
         try {
             final HttpResponse<String> resp = Unirest.get(consul().getUrl() + EndpointCategory.Session.getUri() + "info/" + id)
                 .asString();
@@ -75,7 +93,7 @@ public class Session extends ConsulChain {
             final List<SessionData> sessions =
                 tieSelf(mapper.readValue(resp.getBody(), mapper.getTypeFactory().constructCollectionType(List.class, SessionData.class)));
 
-            if (sessions.size() == 0)
+            if (sessions == null || sessions.size() == 0)
                 return null;
 
             return sessions.get(0);
@@ -85,6 +103,10 @@ public class Session extends ConsulChain {
     }
 
     public List<SessionData> node(String node) throws ConsulException {
+        // Give garbage, get garbage
+        if (node == null || node.trim().length() == 0)
+            return null;
+
         try {
             final HttpResponse<String> resp = Unirest.get(consul().getUrl() + EndpointCategory.Session.getUri() + "node/" + node)
                 .asString();
