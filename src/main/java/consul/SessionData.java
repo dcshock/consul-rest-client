@@ -29,6 +29,7 @@ public class SessionData {
     private Behavior behavior;
     private String ttl;
     private String createIndex;
+    private String modifyIndex;
 
     SessionData() {
     }
@@ -71,6 +72,11 @@ public class SessionData {
     @JsonProperty("CreateIndex")
     public String getCreateIndex() {
         return createIndex;
+    }
+
+    @JsonProperty("ModifyIndex")
+    public String getModifyIndex() {
+        return modifyIndex;
     }
 
     @JsonProperty("LockDelay")
@@ -121,6 +127,12 @@ public class SessionData {
         return this;
     }
 
+    @JsonProperty("ModifyIndex")
+    public SessionData setModifyIndex(String modifyIndex) {
+        this.modifyIndex = modifyIndex;
+        return this;
+    }
+
     SessionData setSessionHandler(Session sessionHandler) {
         this.sessionHandler = sessionHandler;
         return this;
@@ -146,6 +158,7 @@ public class SessionData {
         this.setBehavior(newData.getBehavior())
             .setChecks(newData.getChecks())
             .setCreateIndex(newData.getCreateIndex())
+            .setModifyIndex(newData.getModifyIndex())
             .setId(newData.getId())
             .setLockDelay(newData.getLockDelay())
             .setName(newData.getName())
