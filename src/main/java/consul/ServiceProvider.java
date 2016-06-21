@@ -30,11 +30,11 @@ public class ServiceProvider {
     }
 
     ServiceProvider(JSONObject obj) {
-        id = obj.optString("ServiceID");
+        id = obj.has("ServiceID") ? obj.getString("ServiceID") : obj.optString("ID");
         address = obj.optString("Address");
         node = obj.optString("Node");
-        name = obj.optString("ServiceName");
-        port = obj.optInt("ServicePort");
+        name = obj.has("ServiceName") ? obj.getString("ServiceName") : obj.optString("Service");
+        port = obj.has("ServicePort") ? obj.getInt("ServicePort") : obj.optInt("Port");
         // tags = obj.optJSONArray("ServiceTags");
     }
 

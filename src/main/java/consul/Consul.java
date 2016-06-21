@@ -98,6 +98,10 @@ public class Consul {
         return s;
     }
 
+    public Health health() {
+        return new Health(this);
+    }
+
     /**
      * With some frameworks it is necessary to refresh the unirest connection pool state
      * during runtime. This method does just that.
