@@ -47,7 +47,7 @@ public class HealthService extends ConsulChain {
      * @throws ConsulException
      */
     public HealthServiceCheckResponse check(String name, String consulIndex, int waitTimeSeconds, boolean passing) throws ConsulException {
-        HttpResponse<JsonNode> resp;
+        HttpResponse<String> resp;
         GetRequest request = Unirest.get(consul().getUrl() + EndpointCategory.HealthService.getUri() + "{name}")
                                     .routeParam("name", name);
         if (consulIndex != null) {
@@ -58,14 +58,18 @@ public class HealthService extends ConsulChain {
             request.queryString("passing", "true");
         }
         try {
-            resp = request.asJsonAsync().get((long)Math.ceil(1.1f * waitTimeSeconds), TimeUnit.SECONDS);
+            resp = request.asStringAsync().get((long)Math.ceil(1.1f * waitTimeSeconds), TimeUnit.SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
            throw new ConsulException(e);
         }
 
         String newConsulIndex = resp.getHeaders().getFirst(INDEX_HEADER);
         List<HealthServiceCheck> serviceChecks = new ArrayList<>();
-        JSONArray arr = resp.getBody().getArray();
+        if (resp.getStatus() != 200) {
+            throw new ConsulException("consul returned non 200 status: " + resp.getStatus() + " body: " + resp.getBody());
+        }
+        JsonNode node = parseJson(resp.getBody());
+        JSONArray arr = node.getArray();
         for (int i = 0; i < arr.length(); i++) {
             serviceChecks.add(new HealthServiceCheck(arr.getJSONObject(i)));
         }

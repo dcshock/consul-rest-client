@@ -10,4 +10,8 @@ public class ConsulException extends Exception {
     public ConsulException(Exception e) {
         super(e);
     }
+
+    public ConsulException(String msg, Exception e) {
+        super(msg, e);
+    }
 }

@@ -1,7 +1,6 @@
 package consul;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONArray;
@@ -16,14 +15,9 @@ public class Agent extends ConsulChain {
     }
 
     public Self self() throws ConsulException {
-        try {
-            final HttpResponse<JsonNode> resp =
-                Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "self").asJson();
-            final JSONObject member = resp.getBody().getObject().getJSONObject("Member");
-            return new Self(member.getString("Addr"), member.getInt("Port"), member.getString("Name"));
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
+        final JSONObject member = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "self"))
+                                    .getObject().getJSONObject("Member");
+        return new Self(member.getString("Addr"), member.getInt("Port"), member.getString("Name"));
     }
 
     /**
@@ -33,17 +27,9 @@ public class Agent extends ConsulChain {
      */
     public List<ServiceProvider> services() throws ConsulException {
         final Self self = self();
-
-        final HttpResponse<JsonNode> resp;
-        try {
-            resp = Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "services").asJson();
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
-
         final List<ServiceProvider> providers = new ArrayList<ServiceProvider>();
 
-        final JSONObject obj = resp.getBody().getObject();
+        final JSONObject obj = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "services")).getObject();
         for (Object key : obj.keySet()) {
             final JSONObject service = obj.getJSONObject(key.toString());
 

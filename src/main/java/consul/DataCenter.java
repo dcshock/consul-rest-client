@@ -1,11 +1,8 @@
 package consul;
 
-import org.json.JSONObject;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +21,8 @@ public class DataCenter extends ConsulChain {
 
     public List<Node> nodes()
       throws ConsulException {
-        final List<Node> nodes = new ArrayList<Node>();
-        final HttpResponse<JsonNode> resp;
-        try {
-            resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "nodes").asJson();
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
-
-        final JSONArray arr = resp.getBody().getArray();
+        final List<Node> nodes = new ArrayList<>();
+        final JSONArray arr = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "nodes")).getArray();
         for (int i = 0; i < arr.length(); i++) {
             final JSONObject obj = arr.getJSONObject(i);
             nodes.add(new Node(consul(), this, obj.getString("Node"), obj.getString("Address")));

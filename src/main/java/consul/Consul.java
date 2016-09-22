@@ -1,9 +1,6 @@
 package consul;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.http.options.Options;
 import org.json.JSONArray;
 
@@ -81,16 +78,9 @@ public class Consul {
      * @throws ConsulException
      */
     public Service service(EndpointCategory category, String name) throws ConsulException {
-        final HttpResponse<JsonNode> resp;
-        try {
-            resp = Unirest.get(this.getUrl() + category.getUri() + "service/{name}").routeParam("name", name).asJson();
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
-
         final Service s = new Service(this);
-
-        final JSONArray arr = resp.getBody().getArray();
+        final JSONArray arr = ConsulChain.checkResponse(Unirest.get(this.getUrl() + category.getUri() + "service/{name}")
+                                                               .routeParam("name", name)).getArray();
         for (int i = 0; i < arr.length(); i++) {
             s.add(arr.getJSONObject(i));
         }

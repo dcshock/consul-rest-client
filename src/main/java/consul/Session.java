@@ -78,13 +78,14 @@ public class Session extends ConsulChain {
         }
     }
 
-    public SessionData info(String id) throws ConsulException {
+    public SessionData info(String uuid) throws ConsulException {
         // Give garbage, get garbage
-        if (id == null || id.trim().length() == 0)
+        // consul expects a UUID of 36 length
+        if (uuid == null || uuid.trim().length() != 36)
             return null;
 
         try {
-            final HttpResponse<String> resp = Unirest.get(consul().getUrl() + EndpointCategory.Session.getUri() + "info/" + id)
+            final HttpResponse<String> resp = Unirest.get(consul().getUrl() + EndpointCategory.Session.getUri() + "info/" + uuid)
                 .asString();
 
             if (resp.getStatus() != 200)
