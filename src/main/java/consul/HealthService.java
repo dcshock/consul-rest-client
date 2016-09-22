@@ -65,8 +65,8 @@ public class HealthService extends ConsulChain {
 
         String newConsulIndex = resp.getHeaders().getFirst(INDEX_HEADER);
         List<HealthServiceCheck> serviceChecks = new ArrayList<>();
-        if (resp.getStatus() != 200) {
-            throw new ConsulException("consul returned non 200 status: " + resp.getStatus() + " body: " + resp.getBody());
+        if (resp.getStatus() >= 500) {
+            throw new ConsulException("Error Status Code: " + resp.getStatus() + "  body: " + resp.getBody());
         }
         JsonNode node = parseJson(resp.getBody());
         JSONArray arr = node.getArray();

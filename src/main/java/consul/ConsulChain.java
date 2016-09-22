@@ -30,8 +30,8 @@ public class ConsulChain {
          String body;
          try {
              HttpResponse<String> response = request.asString();
-             if (response.getStatus() > 404) {
-                 throw new ConsulException("Error Status Code: " + response.getStatus());
+             if (response.getStatus() >= 500) {
+                 throw new ConsulException("Error Status Code: " + response.getStatus() + " body: " + response.getBody());
              }
 
              body = response.getBody();
