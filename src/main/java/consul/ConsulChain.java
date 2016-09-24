@@ -27,15 +27,12 @@ public class ConsulChain {
     }
 
     public static JsonNode checkResponse(HttpRequest request) throws ConsulException {
-         String body;
          try {
              HttpResponse<String> response = request.asString();
              if (response.getStatus() >= 500) {
                  throw new ConsulException("Error Status Code: " + response.getStatus() + " body: " + response.getBody());
              }
-
-             body = response.getBody();
-             return parseJson(body);
+             return parseJson(response.getBody());
          } catch (UnirestException e) {
              throw new ConsulException(e);
          }
@@ -43,7 +40,7 @@ public class ConsulChain {
 
     public static JsonNode parseJson(String body) throws ConsulException {
         try {
-            return new com.mashape.unirest.http.JsonNode(body);
+            return new JsonNode(body);
         } catch (RuntimeException e) {
             if (e.getCause() instanceof JSONException) {
                 throw new ConsulException("Invalid Json found: " + body, (JSONException)e.getCause());

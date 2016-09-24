@@ -1,7 +1,6 @@
 package consul;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.GetRequest;
 import org.json.JSONArray;
@@ -68,8 +67,7 @@ public class HealthService extends ConsulChain {
         if (resp.getStatus() >= 500) {
             throw new ConsulException("Error Status Code: " + resp.getStatus() + "  body: " + resp.getBody());
         }
-        JsonNode node = parseJson(resp.getBody());
-        JSONArray arr = node.getArray();
+        JSONArray arr = parseJson(resp.getBody()).getArray();
         for (int i = 0; i < arr.length(); i++) {
             serviceChecks.add(new HealthServiceCheck(arr.getJSONObject(i)));
         }
