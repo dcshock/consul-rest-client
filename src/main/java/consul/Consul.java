@@ -113,7 +113,7 @@ public class Consul {
      *
      * @return - Url
      */
-    String getUrl() {
+    public String getUrl() {
         return uri + ":" + port;
     }
 }
