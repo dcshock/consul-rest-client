@@ -1,7 +1,6 @@
 package consul;
 
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.request.GetRequest;
 import org.json.JSONArray;
@@ -47,7 +46,7 @@ public class HealthService extends ConsulChain {
      * @throws ConsulException
      */
     public HealthServiceCheckResponse check(String name, String consulIndex, int waitTimeSeconds, boolean passing) throws ConsulException {
-        HttpResponse<JsonNode> resp;
+        HttpResponse<String> resp;
         GetRequest request = Unirest.get(consul().getUrl() + EndpointCategory.HealthService.getUri() + "{name}")
                                     .routeParam("name", name);
         if (consulIndex != null) {
@@ -58,14 +57,17 @@ public class HealthService extends ConsulChain {
             request.queryString("passing", "true");
         }
         try {
-            resp = request.asJsonAsync().get((long)Math.ceil(1.1f * waitTimeSeconds), TimeUnit.SECONDS);
+            resp = request.asStringAsync().get((long)Math.ceil(1.1f * waitTimeSeconds), TimeUnit.SECONDS);
         } catch (ExecutionException | InterruptedException | TimeoutException e) {
            throw new ConsulException(e);
         }
 
         String newConsulIndex = resp.getHeaders().getFirst(INDEX_HEADER);
         List<HealthServiceCheck> serviceChecks = new ArrayList<>();
-        JSONArray arr = resp.getBody().getArray();
+        if (resp.getStatus() >= 500) {
+            throw new ConsulException("Error Status Code: " + resp.getStatus() + "  body: " + resp.getBody());
+        }
+        JSONArray arr = parseJson(resp.getBody()).getArray();
         for (int i = 0; i < arr.length(); i++) {
             serviceChecks.add(new HealthServiceCheck(arr.getJSONObject(i)));
         }

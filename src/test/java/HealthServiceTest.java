@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Ignore("Needs a service registered with consul called testService")
 public class HealthServiceTest {
@@ -49,7 +50,14 @@ public class HealthServiceTest {
                throw new RuntimeException(e);
             }
         })
-        .whenComplete((r,t) -> { if (t == null) System.out.println(r);latch.countDown(); });
+        .whenComplete((r,t) -> {
+            if (t == null) {
+                System.out.println("Complete: " + r.getServiceList().stream()
+                                                         .map(x -> x.getProvider().getName())
+                                                         .collect(Collectors.joining(", ")));
+            }
+            latch.countDown();
+        });
         latch.await(6, TimeUnit.SECONDS);
         assertTrue(System.currentTimeMillis() - startTime > 4950);
     }

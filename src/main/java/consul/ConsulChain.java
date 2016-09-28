@@ -1,6 +1,11 @@
 package consul;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import com.mashape.unirest.request.HttpRequest;
+import org.json.JSONException;
 
 public class ConsulChain {
     protected static ObjectMapper mapper = new ObjectMapper();
@@ -19,5 +24,28 @@ public class ConsulChain {
      */
     public Consul consul() {
         return consul;
+    }
+
+    public static JsonNode checkResponse(HttpRequest request) throws ConsulException {
+         try {
+             HttpResponse<String> response = request.asString();
+             if (response.getStatus() >= 500) {
+                 throw new ConsulException("Error Status Code: " + response.getStatus() + " body: " + response.getBody());
+             }
+             return parseJson(response.getBody());
+         } catch (UnirestException e) {
+             throw new ConsulException(e);
+         }
+    }
+
+    public static JsonNode parseJson(String body) throws ConsulException {
+        try {
+            return new JsonNode(body);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof JSONException) {
+                throw new ConsulException("Invalid Json found: " + body, (JSONException)e.getCause());
+            }
+            throw e;
+        }
     }
 }

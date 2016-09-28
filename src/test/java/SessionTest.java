@@ -14,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 public class SessionTest {
     private static Session s;
@@ -36,10 +37,9 @@ public class SessionTest {
 
     @Test
     public void testCreate() throws Exception {
-        String id = s.create("" + System.currentTimeMillis());
-        assertNotNull(id);
-
-        SessionData data = s.info(id);
+        String sessionId = s.create("testCreate" + System.currentTimeMillis());
+        SessionData data = s.info(sessionId);
+        assertNotNull(data);
         assertEquals("15000000000", data.getLockDelay());
         assertEquals("0s", data.getTtl());
         assertEquals(1, data.getChecks().length);
@@ -47,8 +47,8 @@ public class SessionTest {
         assertEquals(Behavior.RELEASE, data.getBehavior());
         assertTrue(data.destroy());
 
-        id = s.create("" + System.currentTimeMillis(), 12, Behavior.DELETE, 60);
-        data = s.info(id);
+        sessionId = s.create("testCreate2" + System.currentTimeMillis(), 12, Behavior.DELETE, 60);
+        data = s.info(sessionId);
         assertEquals("12000000000", data.getLockDelay());
         assertEquals("60s", data.getTtl());
         assertEquals(1, data.getChecks().length);
@@ -60,7 +60,7 @@ public class SessionTest {
     @Test
     public void testGetInfoRandomSession() {
         try {
-            String id = "" + System.currentTimeMillis();
+            String id = UUID.randomUUID().toString();
             assertNull(s.info(id));
         } catch (Exception e) {
             e.printStackTrace();
@@ -81,14 +81,14 @@ public class SessionTest {
 
     @Test
     public void testRenew() throws ConsulException {
-        final String id = s.create("" + System.currentTimeMillis());
+        final String id = s.create(UUID.randomUUID().toString());
         assertNotNull(id);
         assertTrue(s.info(id).renew());
     }
 
     @Test
     public void testAll() throws ConsulException {
-        final String id = s.create("" + System.currentTimeMillis());
+        final String id = s.create(UUID.randomUUID().toString());
 
         final List<SessionData> sessions = s.all();
         assertEquals(1, sessions.size());
@@ -97,7 +97,7 @@ public class SessionTest {
 
     @Test
     public void testInfo() throws ConsulException {
-        final String id = s.create("" + System.currentTimeMillis());
+        final String id = s.create(UUID.randomUUID().toString());
 
         final SessionData data = s.info(id);
         assertNotNull(data);
@@ -111,7 +111,7 @@ public class SessionTest {
 
     @Test
     public void testNode() throws ConsulException {
-        final String id = s.create("" + System.currentTimeMillis());
+        final String id = s.create(UUID.randomUUID().toString());
         final String node = s.info(id).getNode();
 
         final List<SessionData> nodeSessions = s.node(node);

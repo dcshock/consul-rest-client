@@ -50,9 +50,17 @@ public class Session extends ConsulChain {
         if (session == null)
             return false;
 
+        return destroy(session.getId());
+    }
+
+    public boolean destroy(String sessionId) throws ConsulException {
+        // Give garbage, get garbage
+        if (sessionId == null)
+            return false;
+
         try {
-            final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "destroy/" + session.getId())
-                .asString();
+            final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "destroy/" + sessionId)
+                                                     .asString();
 
             return resp.getStatus() == 200;
         } catch (UnirestException e) {
@@ -65,8 +73,16 @@ public class Session extends ConsulChain {
         if (session == null)
             return null;
 
+        return renew(session.getId());
+    }
+
+    public List<SessionData> renew(String sessionId) throws ConsulException {
+        // Give garbage, get garbage
+        if (sessionId == null)
+            return null;
+
         try {
-            final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "renew/" + session.getId())
+            final HttpResponse<String> resp = Unirest.put(consul().getUrl() + EndpointCategory.Session.getUri() + "renew/" + sessionId)
                 .asString();
 
             if (resp.getStatus() != 200)
@@ -78,13 +94,14 @@ public class Session extends ConsulChain {
         }
     }
 
-    public SessionData info(String id) throws ConsulException {
+    public SessionData info(String uuid) throws ConsulException {
         // Give garbage, get garbage
-        if (id == null || id.trim().length() == 0)
+        // consul expects a UUID of 36 length
+        if (uuid == null || uuid.trim().length() != 36)
             return null;
 
         try {
-            final HttpResponse<String> resp = Unirest.get(consul().getUrl() + EndpointCategory.Session.getUri() + "info/" + id)
+            final HttpResponse<String> resp = Unirest.get(consul().getUrl() + EndpointCategory.Session.getUri() + "info/" + uuid)
                 .asString();
 
             if (resp.getStatus() != 200)

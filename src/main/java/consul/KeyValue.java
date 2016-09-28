@@ -45,14 +45,8 @@ public class KeyValue extends ConsulChain {
         if (key == null || key.trim().length() == 0)
             return null;
 
-        final HttpResponse<JsonNode> resp;
-        try {
-            resp = Unirest.get(consul().getUrl() + EndpointCategory.KV.getUri() + key).asJson();
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
-
-        return new KV(resp.getBody().getArray().getJSONObject(0));
+        final JsonNode resp = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.KV.getUri() + key));
+        return new KV(resp.getArray().getJSONObject(0));
     }
 
     public boolean delete(String key) throws ConsulException {

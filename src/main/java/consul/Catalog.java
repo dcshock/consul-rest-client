@@ -22,14 +22,8 @@ public class Catalog extends ConsulChain {
     public List<DataCenter> datacenters()
       throws ConsulException {
         final List<DataCenter> list = new ArrayList<DataCenter>();
-        final HttpResponse<JsonNode> resp;
-        try {
-            resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "datacenters").asJson();
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
-
-        final JSONArray arr = resp.getBody().getArray();
+        final JSONArray arr = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "datacenters"))
+                                .getArray();
         for (int i = 0; i < arr.length(); i++) {
             list.add(new DataCenter(consul(), arr.getString(i)));
         }
@@ -55,15 +49,8 @@ public class Catalog extends ConsulChain {
      */
     public List<Service> services() throws ConsulException {
         final List<Service> services = new ArrayList<Service>();
-
-        final HttpResponse<JsonNode> resp;
-        try {
-            resp = Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "services").asJson();
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
-
-        final JSONObject obj = resp.getBody().getObject();
+        final JSONObject obj = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "services"))
+                                    .getObject();
 
         for (Object key : obj.keySet()) {
 
@@ -89,15 +76,8 @@ public class Catalog extends ConsulChain {
      */
     public List<ServiceCheck> checks(String serviceName) throws ConsulException {
         final List<ServiceCheck> checks = new ArrayList<ServiceCheck>();
+        final JSONArray arr = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Check.getUri() + serviceName)).getArray();
 
-        final HttpResponse<JsonNode> resp;
-        try {
-            resp = Unirest.get(consul().getUrl() + EndpointCategory.Check.getUri() + serviceName).asJson();
-        } catch (UnirestException e) {
-            throw new ConsulException(e);
-        }
-
-        final JSONArray arr = resp.getBody().getArray();
         for (int i = 0; i < arr.length(); i++) {
             final ServiceCheck s = new ServiceCheck(arr.getJSONObject(i));
             checks.add(s);
