@@ -5,7 +5,7 @@ Java REST client for Consul.io
 
 Welcome! Hopefully this helps someone get started using Consul from java applications. This code has been production tested at this point, but will remain beta release until all the Consul endpoints are implemented. Feel free to submit issues, or pull requests to contribute. 
 
-Latest Version Available 0.8
+Latest Version Available 0.12
 
 ## Maven Dependency
 ```
