@@ -5,7 +5,7 @@ jdk:
   - oraclejdk8
 sudo: false
 before_install:
-  - curl -0 https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_amd64.zip -o consul.zip && unzip consul.zip && nohup ./consul agent -dev &
+  - curl -0 https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_amd64.zip -o consul.zip && unzip consul.zip && ./consul agent -dev &
 env:
   global:
     - secure: uV1Qhx4Bgfiyc+X0GIS1LqjCfMJSm9fIdgoe63CPEPwhf6qTKfzpYOGOos6UTotvSSmIeLmUEUjJurYM1UOnRtltXClpz0lL/WrKDhoyGHdWwk+HrHAOkXhUncTloOA15gNfDS/8JeatT5J3FWXoLVXJBRBN41/uvZV0FTFKdiE=
