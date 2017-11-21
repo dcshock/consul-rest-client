@@ -1,6 +1,6 @@
 package consul;
 
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class AgentCheck {
     String id;
@@ -23,13 +23,13 @@ public class AgentCheck {
         this.ttl = ttl;
     }
 
-    AgentCheck(JSONObject obj) {
-        id = obj.optString("ID");
-        name = obj.optString("Name");
-        notes = obj.optString("Notes");
-        script = obj.optString("Script");
-        interval = obj.optString("Interval");
-        ttl = obj.optString("TTL");
+    AgentCheck(JsonNode obj) {
+        id = obj.get("ID").asText();
+        name = obj.get("Name").asText();
+        notes = obj.get("Notes").asText();
+        script = obj.get("Script").asText();
+        interval = obj.get("Interval").asText();
+        ttl = obj.get("TTL").asText();
     }
 
     public String getId() {

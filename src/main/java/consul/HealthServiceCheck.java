@@ -1,7 +1,7 @@
 package consul;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,16 +11,14 @@ public class HealthServiceCheck {
     ServiceProvider provider;
     List<ServiceCheck> checks;
 
-    HealthServiceCheck(JSONObject node) {
-        JSONArray checks = node.getJSONArray("Checks");
-
-        this.provider = new ServiceProvider(node.getJSONObject("Service"));
-        this.checks = new ArrayList<>(checks.length());
-        this.provider.address = node.getJSONObject("Node").getString("Address");
-        this.provider.node = node.getJSONObject("Node").getString("Node");
-
-        for(int i = 0; i < checks.length(); i++) {
-            this.checks.add(new ServiceCheck(checks.getJSONObject(i)));
+    HealthServiceCheck(JsonNode node) {
+        final ArrayNode checks = (ArrayNode) node.get("Checks");
+        this.provider = new ServiceProvider(node.get("Service"));
+        this.checks = new ArrayList<>(checks.size());
+        this.provider.address = node.get("Node").get("Address").asText();
+        this.provider.node = node.get("Node").get("Node").asText();
+        for(int i = 0; i < checks.size(); i++) {
+            this.checks.add(new ServiceCheck(checks.get(i)));
         }
     }
 

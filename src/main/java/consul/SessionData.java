@@ -140,7 +140,6 @@ public class SessionData {
 
     /**
      * Destroy the session in consul.
-     * @return
      * @throws ConsulException
      */
     public boolean destroy() throws ConsulException {
@@ -149,7 +148,6 @@ public class SessionData {
 
     /**
      * Renew the session in consul. This works with 0.5.2 and above.
-     * @return
      * @throws ConsulException
      */
     public boolean renew()  throws ConsulException {

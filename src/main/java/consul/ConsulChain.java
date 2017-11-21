@@ -1,14 +1,12 @@
 package consul;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
-import org.json.JSONException;
+
+import java.io.IOException;
 
 public class ConsulChain {
-    protected static ObjectMapper mapper = new ObjectMapper();
+    static ObjectMapper mapper = new ObjectMapper();
     private Consul consul;
 
     protected ConsulChain(Consul consul) {
@@ -18,34 +16,27 @@ public class ConsulChain {
     }
 
     /**
-     * Return the consul object that is reading from the node from which the accessed object was
-     * populated.
-     * @return
+     * Return the consul object that is reading from the node from which the accessed object was populated.
      */
     public Consul consul() {
         return consul;
     }
 
-    public static JsonNode checkResponse(HttpRequest request) throws ConsulException {
-         try {
-             HttpResponse<String> response = request.asString();
-             if (response.getStatus() >= 500) {
-                 throw new ConsulException("Error Status Code: " + response.getStatus() + " body: " + response.getBody());
-             }
-             return parseJson(response.getBody());
-         } catch (UnirestException e) {
-             throw new ConsulException(e);
+    public static JsonNode checkResponse(HttpResp response) throws ConsulException {
+         if (response.getStatus() >= Http.INTERNAL_SERVER_ERROR) {
+             throw new ConsulException("Error Status Code: " + response.getStatus() + " body: " + response.getBody());
          }
+         return parseJson(response.getBody());
     }
 
     public static JsonNode parseJson(String body) throws ConsulException {
         try {
-            return new JsonNode(body);
-        } catch (RuntimeException e) {
-            if (e.getCause() instanceof JSONException) {
-                throw new ConsulException("Invalid Json found: " + body, (JSONException)e.getCause());
+            if (body == null || "".equals(body.trim())) {
+                return mapper.createObjectNode();
             }
-            throw e;
+            return mapper.readTree(body.getBytes());
+        } catch (IOException e) {
+            throw new ConsulException("Invalid Json found: " + body, e);
         }
     }
 }

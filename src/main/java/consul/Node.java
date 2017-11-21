@@ -1,10 +1,9 @@
 package consul;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Node extends ConsulChain {
     private DataCenter dc;
@@ -22,35 +21,33 @@ public class Node extends ConsulChain {
         this.address = address;
     }
 
-    public String register(ServiceProvider provider)
-      throws ConsulException {
-        final JSONArray tags = new JSONArray();
-        if (provider.getTags() != null) {
-            tags.put(provider.getTags());
-        }
+    public String register(ServiceProvider provider) throws ConsulException {
 
-        final JSONObject service = new JSONObject();
+        final Map<String, Object> service = new HashMap<>();
         service.put("ID", provider.getId());
         service.put("Service", provider.getName());
         service.put("Port", provider.getPort());
-        if (tags.length() > 0) {
-            service.put("Tags", tags);
+        if (provider.getTags() != null && provider.getTags().length > 0) {
+            service.put("Tags", Arrays.asList(provider.getTags()));
         }
 
-        final JSONObject obj = new JSONObject();
+        final Map<String, Object> obj = new HashMap<>();
         obj.put("Datacenter", this.dc.getName());
         obj.put("Node", this.name);
         obj.put("Address", this.address);
         obj.put("Service", service);
 
-        final HttpResponse<String> resp;
+        final HttpResp resp;
         try {
-            resp = Unirest.put(consul().getUrl() + EndpointCategory.Catalog.getUri() + "register").body(obj.toString()).asString();
-        } catch (UnirestException e) {
+            resp = Http.put(
+                consul().getUrl() + EndpointCategory.Catalog.getUri() + "register",
+                mapper.writeValueAsString(obj)
+            );
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
 
-        return resp.getBody().toString();
+        return resp.getBody();
     }
 
     public String getName() {

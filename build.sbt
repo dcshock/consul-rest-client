@@ -1,11 +1,12 @@
 name := "consul-rest-client"
 organization := "com.github.dcshock"
-version := "0.12"
+version := "1.0"
 
 libraryDependencies ++= Seq(
-  "com.mashape.unirest" % "unirest-java" % "1.3.27",
+  "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
   "com.fasterxml.jackson.core" % "jackson-core" % "2.6.2",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.2",
+  "org.apache.commons" % "commons-lang3" % "3.4",
   "com.novocode" % "junit-interface" % "0.10" % "test",
   "org.mockito" % "mockito-all" % "1.9.5" % "test"
 )
@@ -27,6 +28,13 @@ EclipseKeys.projectFlavor := EclipseProjectFlavor.Java
 autoScalaLibrary := false
 crossPaths := false
 publishMavenStyle := true
+
+credentials += Credentials(
+  "Sonatype Nexus Repository Manager",
+  "oss.sonatype.org",
+  sys.env.getOrElse("SONATYPE_USER", ""),
+  sys.env.getOrElse("SONATYPE_PASS", "")
+)
 
 publishTo := {
   val nexus = "https://oss.sonatype.org/"

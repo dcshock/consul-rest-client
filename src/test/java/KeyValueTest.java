@@ -12,6 +12,7 @@ import consul.Session;
 import consul.SessionData.Behavior;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class KeyValueTest {
