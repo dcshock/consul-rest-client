@@ -1,6 +1,8 @@
 package consul;
 
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.Optional;
 
 public class ServiceCheck {
     String id;
@@ -11,14 +13,13 @@ public class ServiceCheck {
     String notes;
     boolean useable;
 
-    ServiceCheck(JSONObject obj) {
-        id = obj.optString("CheckID");
-        name = obj.optString("Name");
-        serviceId = obj.optString("ServiceID");
-        serviceName = obj.optString("ServiceName");
-        status = obj.optString("Status");
-        notes = obj.optString("Notes");
-
+    ServiceCheck(JsonNode obj) {
+        id = Optional.ofNullable(obj.get("CheckID")).map(JsonNode::asText).orElse("");
+        name = Optional.ofNullable(obj.get("Name")).map(JsonNode::asText).orElse("");
+        serviceId = Optional.ofNullable(obj.get("ServiceID")).map(JsonNode::asText).orElse("");
+        serviceName = Optional.ofNullable(obj.get("ServiceName")).map(JsonNode::asText).orElse("");
+        status = Optional.ofNullable(obj.get("Status")).map(JsonNode::asText).orElse("");
+        notes = Optional.ofNullable(obj.get("Notes")).map(JsonNode::asText).orElse("");
         if ("passing".equalsIgnoreCase(status)) {
             useable = true;
         }

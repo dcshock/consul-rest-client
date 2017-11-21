@@ -1,8 +1,7 @@
 package consul;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.options.Options;
-import org.json.JSONArray;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.IOException;
 
@@ -22,25 +21,22 @@ public class Consul {
     }
 
     public static void main(String args[]) throws Exception {
-        try {
-            final Consul c = new Consul("http://localhost", 8500);
-            c.agent().register(new ServiceProvider("test1", "test", 8302, null));
-            c.agent().checkRegister(new AgentCheck("test2", "check", "These are some notes", "/usr/local/bin/check_mem.py", "10s", "15s"));
-            System.out.println(c.catalog().services());
-            for (Service s : c.catalog().services())
-                System.out.println(c.catalog().service(s.getName()));
-            System.out.println(c.agent().self());
-            System.out.println(c.agent().services());
-            c.agent().deregister("test1");
-            c.agent().checkDeregister("test2");
-            System.out.println(c.agent().services());
-            final KeyValue kv = new KeyValue(c);
-            kv.set("this", "that");
-            System.out.println(kv.get("this"));
-            kv.delete("this");
-        } finally {
-            Unirest.shutdown();
+        final Consul c = new Consul("http://localhost", 8500);
+        c.agent().register(new ServiceProvider("test1", "test", 8302, null));
+        c.agent().checkRegister(new AgentCheck("test2", "check", "These are some notes", "/usr/local/bin/check_mem.py", "10s", "15s"));
+        c.catalog().services().stream().forEach(System.out::println);
+        for (Service s : c.catalog().services()) {
+            c.catalog().service(s.getName()).getProviders().stream().forEach(System.out::println);
         }
+        System.out.println(c.agent().self());
+        c.agent().services().stream().forEach(System.out::println);
+        c.agent().deregister("test1");
+        c.agent().checkDeregister("test2");
+        c.agent().services().stream().forEach(System.out::println);
+        final KeyValue kv = new KeyValue(c);
+        kv.set("this", "that");
+        System.out.println(kv.get("this"));
+        kv.delete("this");
     }
 
     /**
@@ -54,8 +50,6 @@ public class Consul {
 
     /**
      * An agent instance.
-     *
-     * @return
      */
     public Agent agent() {
         return new Agent(this);
@@ -71,21 +65,21 @@ public class Consul {
 
     /**
      * Call the service api of consul using the given endpoint.
-     *
-     * @param category
-     * @param name
-     * @return
      * @throws ConsulException
      */
     public Service service(EndpointCategory category, String name) throws ConsulException {
-        final Service s = new Service(this);
-        final JSONArray arr = ConsulChain.checkResponse(Unirest.get(this.getUrl() + category.getUri() + "service/{name}")
-                                                               .routeParam("name", name)).getArray();
-        for (int i = 0; i < arr.length(); i++) {
-            s.add(arr.getJSONObject(i));
+        try {
+            final Service s = new Service(this);
+            final HttpResp resp = Http.get(this.getUrl() + category.getUri() + "service/" + name);
+            final JsonNode node = ConsulChain.checkResponse(resp);
+            final ArrayNode arr = (ArrayNode)node;
+            for (int i = 0; i < arr.size(); i++) {
+                s.add(arr.get(i));
+            }
+            return s;
+        } catch (IOException e) {
+            throw new ConsulException(e);
         }
-
-        return s;
     }
 
     public Health health() {
@@ -93,19 +87,14 @@ public class Consul {
     }
 
     /**
-     * With some frameworks it is necessary to refresh the unirest connection pool state
-     * during runtime. This method does just that.
+     * With some frameworks it is necessary to refresh state during runtime.
      */
     public void startup() {
-        Options.refresh();
+        // No-op
     }
 
     public void shutdown() {
-        try {
-            Unirest.shutdown();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // No-op
     }
 
     /**

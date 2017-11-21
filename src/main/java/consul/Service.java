@@ -1,6 +1,6 @@
 package consul;
 
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,7 +9,7 @@ import java.util.List;
 public class Service extends ConsulChain {
     private String name;
     private String[] tags;
-    private List<ServiceProvider> providers = new ArrayList<ServiceProvider>();
+    private List<ServiceProvider> providers = new ArrayList<>();
 
     Service(Consul consul) {
         super(consul);
@@ -21,7 +21,7 @@ public class Service extends ConsulChain {
         this.tags = tags;
     }
 
-    void add(JSONObject obj) {
+    void add(JsonNode obj) {
         providers.add(new ServiceProvider(obj));
     }
 

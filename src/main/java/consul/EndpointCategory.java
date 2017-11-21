@@ -10,7 +10,7 @@ public enum EndpointCategory {
 
     private String uri;
 
-    private EndpointCategory(String uri) {
+    EndpointCategory(String uri) {
         this.uri = uri;
     }
 

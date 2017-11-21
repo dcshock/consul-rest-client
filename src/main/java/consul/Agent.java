@@ -1,13 +1,16 @@
 package consul;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Agent extends ConsulChain {
     Agent(Consul consul) {
@@ -15,142 +18,148 @@ public class Agent extends ConsulChain {
     }
 
     public Self self() throws ConsulException {
-        final JSONObject member = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "self"))
-                                    .getObject().getJSONObject("Member");
-        return new Self(member.getString("Addr"), member.getInt("Port"), member.getString("Name"));
+        try {
+            final HttpResp resp = Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "self");
+            final JsonNode checked = checkResponse(resp);
+            final JsonNode member = checked.get("Member");
+            return new Self(
+                member.get("Addr").asText(),
+                member.get("Port").asInt(),
+                member.get("Name").asText()
+            );
+        } catch (IOException e) {
+            throw new ConsulException(e);
+        }
     }
 
     /**
      * Returns a list of all services offered.
-     * @return
      * @throws ConsulException
      */
     public List<ServiceProvider> services() throws ConsulException {
-        final Self self = self();
-        final List<ServiceProvider> providers = new ArrayList<ServiceProvider>();
-
-        final JSONObject obj = checkResponse(Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "services")).getObject();
-        for (Object key : obj.keySet()) {
-            final JSONObject service = obj.getJSONObject(key.toString());
-
-            final ServiceProvider provider = new ServiceProvider();
-            provider.setId(service.getString("ID"));
-            provider.setName(service.getString("Service"));
-            provider.setPort(service.getInt("Port"));
-
-            // Map tags
-            String[] tags = null;
-            if (!service.isNull("Tags")) {
-                final JSONArray arr = service.getJSONArray("Tags");
-                tags = new String[arr.length()];
-                for (int i = 0; i < service.getJSONArray("Tags").length(); i++) {
-                    tags[i] = arr.getString(i);
+        try {
+            final Self self = self();
+            final List<ServiceProvider> providers = new ArrayList<>();
+            final HttpResp resp = Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "services");
+            final JsonNode obj = checkResponse(resp);
+            for (final Iterator<String> itr = obj.fieldNames(); itr.hasNext(); ) {
+                final JsonNode service = obj.get(itr.next());
+                final ServiceProvider provider = new ServiceProvider();
+                provider.setId(service.get("ID").asText());
+                provider.setName(service.get("Service").asText());
+                provider.setPort(service.get("Port").asInt());
+                // Map tags
+                String[] tags = null;
+                if (service.has("Tags") && service.get("Tags").isArray()) {
+                    final ArrayNode arr = (ArrayNode)service.get("Tags");
+                    tags = new String[arr.size()];
+                    for (int i = 0; i < arr.size(); i++) {
+                        tags[i] = arr.get(i).asText();
+                    }
                 }
+                provider.setTags(tags);
+                provider.setAddress(self.getAddress());
+                provider.setNode(self.getNode());
+                providers.add(provider);
             }
-            provider.setTags(tags);
-            provider.setAddress(self.getAddress());
-            provider.setNode(self.getNode());
-
-            providers.add(provider);
+            return providers;
+        } catch (IOException e) {
+            throw new ConsulException(e);
         }
-
-        return providers;
     }
 
     public String register(ServiceProvider provider) throws ConsulException {
-        final JSONArray tags = new JSONArray();
+        final Set<String> tags = new TreeSet<>();
         if (provider.getTags() != null) {
             for (String tag : provider.getTags()) {
-                tags.put(tag);
+                tags.add(tag);
             }
         }
-
-        final JSONObject service = new JSONObject();
+        final Map<String, Object> service = new HashMap<>();
         service.put("ID", provider.getId());
         service.put("Name", provider.getName());
         service.put("Port", provider.getPort());
-        if (tags.length() > 0) {
+        if (tags.size() > 0) {
             service.put("Tags", tags);
         }
-
-        final HttpResponse<String> resp;
+        final HttpResp resp;
         try {
-            resp = Unirest.put(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/register")
-                .body(service.toString()).asString();
-        } catch (UnirestException e) {
+            resp = Http.put(
+                consul().getUrl() + EndpointCategory.Agent.getUri() + "service/register",
+                mapper.writeValueAsString(service)
+            );
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
-
-        return resp.getBody().toString();
+        return resp.getBody();
     }
 
     public void deregister(String serviceId) throws ConsulException {
         try {
-            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId).asString();
-        } catch (UnirestException e) {
+            Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "service/deregister/" + serviceId);
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
     }
 
     public String getChecks() throws ConsulException {
-        final HttpResponse<String> resp;
+        final HttpResp resp;
         try {
-            resp = Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "checks").asString();
-        } catch (UnirestException e) {
+            resp = Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "checks");
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
-
-        return resp.getBody().toString();
+        return resp.getBody();
     }
 
     public String checkRegister(AgentCheck check) throws ConsulException {
-        final JSONObject agentCheck = new JSONObject();
+        final Map<String, Object> agentCheck = new HashMap<>();
         agentCheck.put("ID", check.getId());
         agentCheck.put("Name", check.getName());
         agentCheck.put("Notes", check.getNotes());
         agentCheck.put("Script", check.getScript());
         agentCheck.put("Interval", check.getInterval());
         agentCheck.put("TTL", check.getTTL());
-
-        HttpResponse<String> resp;
+        HttpResp resp;
         try {
-            resp = Unirest.put(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/register")
-                .body(agentCheck.toString()).asString();
-        } catch (UnirestException e) {
+            resp = Http.put(
+                consul().getUrl() + EndpointCategory.Agent.getUri() + "check/register",
+                mapper.writeValueAsString(agentCheck)
+            );
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
-
-        return resp.getBody().toString();
+        return resp.getBody();
     }
 
     public void checkDeregister(String checkId) throws ConsulException {
         try {
-            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId).asString();
-        } catch (UnirestException e) {
+            Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/deregister/" + checkId);
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
     }
 
     public void checkPass(String checkId) throws ConsulException {
         try {
-            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/pass/" + checkId).asString();
-        } catch (UnirestException e) {
+            Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/pass/" + checkId);
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
     }
 
     public void checkWarn(String checkId) throws ConsulException {
         try {
-            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/warn/" + checkId).asString();
-        } catch (UnirestException e) {
+            Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/warn/" + checkId);
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
     }
 
     public void checkFail(String checkId) throws ConsulException {
         try {
-            Unirest.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/fail/" + checkId).asString();
-        } catch (UnirestException e) {
+            Http.get(consul().getUrl() + EndpointCategory.Agent.getUri() + "check/fail/" + checkId);
+        } catch (IOException e) {
             throw new ConsulException(e);
         }
     }

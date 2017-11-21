@@ -1,8 +1,9 @@
 package consul;
 
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 public class ServiceProvider {
     String id;
@@ -29,13 +30,12 @@ public class ServiceProvider {
         this.tags = tags;
     }
 
-    ServiceProvider(JSONObject obj) {
-        id = obj.has("ServiceID") ? obj.getString("ServiceID") : obj.optString("ID");
-        address = obj.optString("Address");
-        node = obj.optString("Node");
-        name = obj.has("ServiceName") ? obj.getString("ServiceName") : obj.optString("Service");
-        port = obj.has("ServicePort") ? obj.getInt("ServicePort") : obj.optInt("Port");
-        // tags = obj.optJSONArray("ServiceTags");
+    ServiceProvider(JsonNode obj) {
+        id = obj.has("ServiceID") ? obj.get("ServiceID").asText() : Optional.ofNullable(obj.get("ID")).map(JsonNode::asText).orElse("");
+        address = Optional.ofNullable(obj.get("Address")).map(JsonNode::asText).orElse("");
+        node = Optional.ofNullable(obj.get("Node")).map(JsonNode::asText).orElse("");
+        name = obj.has("ServiceName") ? obj.get("ServiceName").asText() : Optional.ofNullable(obj.get("Service")).map(JsonNode::asText).orElse("");
+        port = obj.has("ServicePort") ? obj.get("ServicePort").asInt() : Optional.ofNullable(obj.get("Port")).map(JsonNode::asInt).orElse(0);
     }
 
     public String getId() {

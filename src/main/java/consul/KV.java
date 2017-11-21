@@ -1,6 +1,8 @@
 package consul;
 
-import org.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import java.util.Optional;
 
 public class KV {
     Integer createIndex;
@@ -12,11 +14,9 @@ public class KV {
     String sessionId;
 
     public KV() {
-
     }
 
-    public KV(Integer createIndex, Integer modifyIndex, Integer lockIndex, String key,
-                    Integer flags, String value, String sessionId) {
+    public KV(Integer createIndex, Integer modifyIndex, Integer lockIndex, String key, Integer flags, String value, String sessionId) {
         this.createIndex = createIndex;
         this.modifyIndex = modifyIndex;
         this.lockIndex = lockIndex;
@@ -26,14 +26,14 @@ public class KV {
         this.sessionId = sessionId;
     }
 
-    KV(JSONObject obj) {
-        this.createIndex = obj.optInt("CreateIndex");
-        this.modifyIndex = obj.optInt("ModifyIndex");
-        this.lockIndex = obj.optInt("LockIndex");
-        this.key = obj.optString("Key");
-        this.flags = obj.optInt("Flags");
-        this.value = obj.optString("Value");
-        this.sessionId = obj.optString("Session");
+    KV(JsonNode obj) {
+        this.createIndex = Optional.ofNullable(obj.get("CreateIndex")).map(JsonNode::asInt).orElse(0);
+        this.modifyIndex = Optional.ofNullable(obj.get("ModifyIndex")).map(JsonNode::asInt).orElse(0);
+        this.lockIndex = Optional.ofNullable(obj.get("LockIndex")).map(JsonNode::asInt).orElse(0);
+        this.key = Optional.ofNullable(obj.get("Key")).map(JsonNode::asText).orElse("");
+        this.flags = Optional.ofNullable(obj.get("Flags")).map(JsonNode::asInt).orElse(0);
+        this.value = Optional.ofNullable(obj.get("Value")).map(JsonNode::asText).orElse("");
+        this.sessionId = Optional.ofNullable(obj.get("Session")).map(JsonNode::asText).orElse("");
     }
 
     public Integer getCreateIndex() {
