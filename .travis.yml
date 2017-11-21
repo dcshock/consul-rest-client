@@ -1,10 +1,14 @@
 language: scala
 scala:
-    - "2.11.4"
+  - 2.11.4
 jdk:
-    - oraclejdk8
+  - oraclejdk8
 sudo: false
-
 before_install:
-    - curl -0 https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_amd64.zip -o consul.zip && unzip consul.zip && nohup ./consul agent -dev &
-
+  - curl -0 https://releases.hashicorp.com/consul/1.0.1/consul_1.0.1_linux_amd64.zip -o consul.zip && unzip consul.zip && nohup ./consul agent -dev &
+env:
+  global:
+    - secure: uV1Qhx4Bgfiyc+X0GIS1LqjCfMJSm9fIdgoe63CPEPwhf6qTKfzpYOGOos6UTotvSSmIeLmUEUjJurYM1UOnRtltXClpz0lL/WrKDhoyGHdWwk+HrHAOkXhUncTloOA15gNfDS/8JeatT5J3FWXoLVXJBRBN41/uvZV0FTFKdiE=
+    - secure: oslYlw8hd54oQZUygcCYbYZiXRpUMqgDyeTxF7CdAtVpFnxK7lTnmJUXXp5S22CXEcK/n/8+V6l+DmvnWYOJ73QbDc11rrYOgrHWE3KH7Cxs0W5JonZUB5WZ2kMM3XcZlfXmggiJqtHNxHBLVoS3khM0+ta/RVcvgNCQM5ZlMao=
+after_success:
+  - ./bin/checkPublish
