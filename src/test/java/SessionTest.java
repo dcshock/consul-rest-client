@@ -17,7 +17,6 @@ import org.junit.Test;
 import java.util.List;
 import java.util.UUID;
 
-@Ignore
 public class SessionTest {
     private static Session s;
 

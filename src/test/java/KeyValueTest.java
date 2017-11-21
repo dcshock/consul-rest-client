@@ -15,7 +15,6 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class KeyValueTest {
     private static Session s;
     private static KeyValue kv;

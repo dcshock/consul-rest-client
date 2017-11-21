@@ -17,7 +17,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Ignore("Needs a service registered with consul called testService")
 public class HealthServiceTest {
     private static Consul c;
     @BeforeClass
