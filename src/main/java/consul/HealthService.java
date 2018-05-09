@@ -89,10 +89,22 @@ public class HealthService extends ConsulChain {
                     String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
     ) throws ConsulException {
         ConsulException lastException = null;
+        HealthServiceCheckResponse service = null;
         for (DataCenter datacenter : this.consul().catalog().datacenters()) {
-            return this.check(name, consulIndex, waitTimeSeconds, passing, executorService, datacenter.getName());
+            try {
+                service = this.check(name, consulIndex, waitTimeSeconds, passing, executorService, datacenter.getName());
+                if (service.getServiceList().size() > 0) {
+                    return service;
+                }
+            } catch (ConsulException e) {
+                lastException = e;
+            }
         }
-        throw new ConsulException("Failed to find health check across datacenters: " + lastException);
+
+        if (lastException != null) {
+            throw new ConsulException("Failed to find health check across datacenters: " + lastException);
+        }
+        return service;
     }
 
     HealthServiceCheckResponse check (
@@ -108,9 +120,11 @@ public class HealthService extends ConsulChain {
         }
         if (passing) {
             params = params + prefix + "passing=true";
+            prefix = "&";
         }
         if (!Objects.equals(datacenter, "")) {
             params = params + prefix + "dc=" + datacenter;
+            prefix = "&";
         }
         final String p = params; // ugh! java lambdas
         try {
