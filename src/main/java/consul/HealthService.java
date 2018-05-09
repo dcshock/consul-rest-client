@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -56,7 +57,7 @@ public class HealthService extends ConsulChain {
      * @throws ConsulException
      */
     public HealthServiceCheckResponse check(String name, String consulIndex, int waitTimeSeconds, boolean passing) throws ConsulException {
-        return check(name, consulIndex, waitTimeSeconds, passing, Executors.newSingleThreadExecutor());
+        return checkAcrossDatacenters(name, consulIndex, waitTimeSeconds, passing, Executors.newSingleThreadExecutor());
     }
 
     /**
@@ -75,7 +76,7 @@ public class HealthService extends ConsulChain {
      * @throws ConsulException
      */
     public HealthServiceCheckResponse check(
-        String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
+        String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService, String datacenter
     ) throws ConsulException {
         HttpResp resp;
         String prefix = "?";
@@ -87,6 +88,9 @@ public class HealthService extends ConsulChain {
         }
         if (passing) {
             params = params + prefix + "passing=true";
+        }
+        if (!Objects.equals(datacenter, "")) {
+            params = params + prefix + "dc=" + datacenter;
         }
         final String p = params; // ugh! java lambdas
         try {
@@ -107,5 +111,20 @@ public class HealthService extends ConsulChain {
             serviceChecks.add(new HealthServiceCheck(arr.get(i)));
         }
         return new HealthServiceCheckResponse(newConsulIndex, serviceChecks);
+    }
+
+    public HealthServiceCheckResponse checkAcrossDatacenters(
+                    String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
+    ) throws ConsulException {
+        ConsulException lastException = null;
+        for (DataCenter datacenter : this.consul().catalog().datacenters()) {
+            try {
+                return this.check(name, consulIndex, waitTimeSeconds, passing, executorService, datacenter.getName());
+            } catch(ConsulException e) {
+                // Try next datacenter
+                lastException = e;
+            }
+        }
+        throw new ConsulException("Failed to find health check across datacenters: " + lastException);
     }
 }
