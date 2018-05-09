@@ -32,6 +32,10 @@ public class HealthService extends ConsulChain {
         return check(name, null, 30, true).getServiceList();
     }
 
+    public List<HealthServiceCheck> checkAcrossDatacenters(String name) throws ConsulException {
+        return checkAcrossDatacenters(name, null, 30, true, Executors.newSingleThreadExecutor()).getServiceList();
+    }
+
     // Need this to 'soften' the IOException for use with CompletableFuture.
     private HttpResp doGet(final String url) {
         try {
@@ -57,7 +61,7 @@ public class HealthService extends ConsulChain {
      * @throws ConsulException
      */
     public HealthServiceCheckResponse check(String name, String consulIndex, int waitTimeSeconds, boolean passing) throws ConsulException {
-        return checkAcrossDatacenters(name, consulIndex, waitTimeSeconds, passing, Executors.newSingleThreadExecutor());
+        return check(name, consulIndex, waitTimeSeconds, passing, Executors.newSingleThreadExecutor());
     }
 
     /**
@@ -76,8 +80,24 @@ public class HealthService extends ConsulChain {
      * @throws ConsulException
      */
     public HealthServiceCheckResponse check(
-        String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService, String datacenter
+        String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
     ) throws ConsulException {
+        return this.check(name, consulIndex, waitTimeSeconds, passing, executorService, "");
+    }
+
+    public HealthServiceCheckResponse checkAcrossDatacenters(
+                    String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
+    ) throws ConsulException {
+        ConsulException lastException = null;
+        for (DataCenter datacenter : this.consul().catalog().datacenters()) {
+            return this.check(name, consulIndex, waitTimeSeconds, passing, executorService, datacenter.getName());
+        }
+        throw new ConsulException("Failed to find health check across datacenters: " + lastException);
+    }
+
+    HealthServiceCheckResponse check (
+                    String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService, String datacenter)
+                    throws ConsulException {
         HttpResp resp;
         String prefix = "?";
         String params = "";
@@ -95,11 +115,11 @@ public class HealthService extends ConsulChain {
         final String p = params; // ugh! java lambdas
         try {
             resp = CompletableFuture.supplyAsync(
-                () -> doGet(consul().getUrl() + EndpointCategory.HealthService.getUri() + name + p),
-                executorService
+                            () -> doGet(consul().getUrl() + EndpointCategory.HealthService.getUri() + name + p),
+                            executorService
             ).get((long)Math.ceil(1.1f * waitTimeSeconds), TimeUnit.SECONDS);
         } catch (RuntimeException | ExecutionException | InterruptedException | TimeoutException e) {
-           throw new ConsulException(e);
+            throw new ConsulException(e);
         }
         final String newConsulIndex = resp.getFirstHeader(INDEX_HEADER);
         final List<HealthServiceCheck> serviceChecks = new ArrayList<>();
@@ -111,20 +131,5 @@ public class HealthService extends ConsulChain {
             serviceChecks.add(new HealthServiceCheck(arr.get(i)));
         }
         return new HealthServiceCheckResponse(newConsulIndex, serviceChecks);
-    }
-
-    public HealthServiceCheckResponse checkAcrossDatacenters(
-                    String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
-    ) throws ConsulException {
-        ConsulException lastException = null;
-        for (DataCenter datacenter : this.consul().catalog().datacenters()) {
-            try {
-                return this.check(name, consulIndex, waitTimeSeconds, passing, executorService, datacenter.getName());
-            } catch(ConsulException e) {
-                // Try next datacenter
-                lastException = e;
-            }
-        }
-        throw new ConsulException("Failed to find health check across datacenters: " + lastException);
     }
 }
