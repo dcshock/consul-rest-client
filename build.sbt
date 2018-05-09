@@ -1,6 +1,6 @@
 name := "consul-rest-client"
 organization := "com.github.dcshock"
-version := "1.6"
+version := "1.0"
 
 libraryDependencies ++= Seq(
   "org.apache.httpcomponents" % "fluent-hc" % "4.5.1",
