@@ -6,3 +6,4 @@ target
 .DS_Store
 bin
 json_examples
+.idea

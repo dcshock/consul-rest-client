@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,9 +50,17 @@ public class Catalog extends ConsulChain {
      * @throws ConsulException
      */
     public List<Service> services() throws ConsulException {
+        return this.servicesByDatacenter("");
+    }
+
+    private List<Service> servicesByDatacenter(String datacenter) throws ConsulException {
         try {
+            String urlSuffix = "services";
+            if (!datacenter.isEmpty()) {
+                urlSuffix += "?dc=" + datacenter;
+            }
             final List<Service> services = new ArrayList<>();
-            final HttpResp resp = Http.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + "services");
+            final HttpResp resp = Http.get(consul().getUrl() + EndpointCategory.Catalog.getUri() + urlSuffix);
             final JsonNode obj = checkResponse(resp);
             for (final Iterator<String> itr = obj.fieldNames(); itr.hasNext(); ) {
                 final String key = itr.next();
@@ -71,6 +80,15 @@ public class Catalog extends ConsulChain {
         } catch (IOException e) {
             throw new ConsulException(e);
         }
+    }
+
+    public List<Service> servicesAcrossDataCenters() throws ConsulException {
+        List<Service> services = Collections.emptyList();
+        List<DataCenter> dataCenters = this.datacenters();
+        for (DataCenter dataCenter : dataCenters) {
+            services.addAll(this.servicesByDatacenter(dataCenter.getName()));
+        }
+        return services;
     }
 
     /**
@@ -98,6 +116,18 @@ public class Catalog extends ConsulChain {
     }
 
     public Service service(String name) throws ConsulException {
-        return consul().service(EndpointCategory.Catalog, name);
+        return consul().service(EndpointCategory.Catalog, name, "");
+    }
+
+    public Service serviceAcrossDataCenters(String name) throws ConsulException {
+        List<DataCenter> dataCenters = this.datacenters();
+        for (DataCenter dataCenter : dataCenters) {
+            try {
+                return consul().service(EndpointCategory.Catalog, name, dataCenter.getName());
+            } catch (ConsulException e) {
+                // Try the next datacenter
+            }
+        }
+        throw new ConsulException("Failed to find service across datacenters");
     }
 }

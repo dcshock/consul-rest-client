@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -29,6 +30,10 @@ public class HealthService extends ConsulChain {
      */
     public List<HealthServiceCheck> check(String name) throws ConsulException {
         return check(name, null, 30, true).getServiceList();
+    }
+
+    public List<HealthServiceCheck> checkAcrossDatacenters(String name) throws ConsulException {
+        return checkAcrossDatacenters(name, null, 30, true, Executors.newSingleThreadExecutor()).getServiceList();
     }
 
     // Need this to 'soften' the IOException for use with CompletableFuture.
@@ -77,6 +82,34 @@ public class HealthService extends ConsulChain {
     public HealthServiceCheckResponse check(
         String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
     ) throws ConsulException {
+        return this.check(name, consulIndex, waitTimeSeconds, passing, executorService, "");
+    }
+
+    public HealthServiceCheckResponse checkAcrossDatacenters(
+                    String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService
+    ) throws ConsulException {
+        ConsulException lastException = null;
+        HealthServiceCheckResponse service = null;
+        for (DataCenter datacenter : this.consul().catalog().datacenters()) {
+            try {
+                service = this.check(name, consulIndex, waitTimeSeconds, passing, executorService, datacenter.getName());
+                if (service.getServiceList().size() > 0) {
+                    return service;
+                }
+            } catch (ConsulException e) {
+                lastException = e;
+            }
+        }
+
+        if (lastException != null) {
+            throw new ConsulException("Failed to find health check across datacenters: " + lastException);
+        }
+        return service;
+    }
+
+    HealthServiceCheckResponse check (
+                    String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService, String datacenter)
+                    throws ConsulException {
         HttpResp resp;
         String prefix = "?";
         String params = "";
@@ -87,15 +120,20 @@ public class HealthService extends ConsulChain {
         }
         if (passing) {
             params = params + prefix + "passing=true";
+            prefix = "&";
+        }
+        if (!Objects.equals(datacenter, "")) {
+            params = params + prefix + "dc=" + datacenter;
+            prefix = "&";
         }
         final String p = params; // ugh! java lambdas
         try {
             resp = CompletableFuture.supplyAsync(
-                () -> doGet(consul().getUrl() + EndpointCategory.HealthService.getUri() + name + p),
-                executorService
+                            () -> doGet(consul().getUrl() + EndpointCategory.HealthService.getUri() + name + p),
+                            executorService
             ).get((long)Math.ceil(1.1f * waitTimeSeconds), TimeUnit.SECONDS);
         } catch (RuntimeException | ExecutionException | InterruptedException | TimeoutException e) {
-           throw new ConsulException(e);
+            throw new ConsulException(e);
         }
         final String newConsulIndex = resp.getFirstHeader(INDEX_HEADER);
         final List<HealthServiceCheck> serviceChecks = new ArrayList<>();

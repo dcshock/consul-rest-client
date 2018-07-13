@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Orchestrates access to Consul's http api.
@@ -67,10 +68,13 @@ public class Consul {
      * Call the service api of consul using the given endpoint.
      * @throws ConsulException
      */
-    public Service service(EndpointCategory category, String name) throws ConsulException {
+    public Service service(EndpointCategory category, String name, String datacenter) throws ConsulException {
         try {
+            if (!Objects.equals(datacenter, "")) {
+                datacenter = "?dc=" + datacenter;
+            }
             final Service s = new Service(this);
-            final HttpResp resp = Http.get(this.getUrl() + category.getUri() + "service/" + name);
+            final HttpResp resp = Http.get(this.getUrl() + category.getUri() + "service/" + name + datacenter);
             final JsonNode node = ConsulChain.checkResponse(resp);
             final ArrayNode arr = (ArrayNode)node;
             for (int i = 0; i < arr.size(); i++) {
