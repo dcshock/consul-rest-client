@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import javax.xml.crypto.Data;
 
 public class Catalog extends ConsulChain {
     public Catalog(Consul consul) {
