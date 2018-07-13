@@ -18,7 +18,7 @@ Latest Version Available 0.12
 
 ## SBT Dependency
 ```
-"com.github.dcshock" % "consul-rest-client" % "0.8"
+"com.github.dcshock" % "consul-rest-client" % "1.1"
 ```
 
 ## Example Usage
