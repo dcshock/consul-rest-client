@@ -89,8 +89,8 @@ public class KeyValue extends ConsulChain {
     }
 
     private boolean lock(String key, String value, String sessionId, LockOperation operation) throws ConsulException {
-        // Give garbage, get garbage
-        if (key == null || key.trim().length() == 0 || value == null || value.trim().length() == 0 ||
+        // Give garbage, get garbage.  Note, we allow a blank value for value, to unset out but leave an existing value.
+        if (key == null || key.trim().length() == 0 || value == null || (operation == LockOperation.ACQUIRE && value.trim().length() == 0) ||
             sessionId == null || sessionId.trim().length() == 0) {
             return false;
         }
