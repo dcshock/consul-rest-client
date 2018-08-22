@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class KeyValueTest {
+public class KeyValueLockTest {
     private static Session s;
     private static KeyValue kv;
 
@@ -56,8 +56,6 @@ public class KeyValueTest {
     @Test
     public void testAcquireAllNullOrBlank() {
         try {
-            String id = s.create("" + System.currentTimeMillis());
-            assertNotNull(id);
             assertFalse(kv.acquireLock(null, null, null));
             assertFalse(kv.acquireLock("", "", ""));
         } catch (Exception e) {
@@ -69,8 +67,6 @@ public class KeyValueTest {
     @Test
     public void testAcquireNullOrBlankSession() {
         try {
-            String id = s.create("" + System.currentTimeMillis());
-            assertNotNull(id);
             assertFalse(kv.acquireLock("key", "value", null));
             assertFalse(kv.acquireLock("key", "value", ""));
         } catch (Exception e) {
@@ -135,14 +131,11 @@ public class KeyValueTest {
     public void testReleaseBlankValue() throws Exception {
         final String id = s.create("" + System.currentTimeMillis());
         assertNotNull(id);
-        final String value = "value";
         try {
-            assertTrue(kv.acquireLock("key", value, id));
+            assertTrue(kv.acquireLock("key", "value", id));
             assertTrue(kv.releaseLock("key", "", id));
             assertEquals("", kv.get("key"));
         } catch (Exception e) {
-            // Hack to release the lock if it fails.
-            assertTrue(kv.releaseLock("key", value, id));
             e.printStackTrace();
             fail("testReleaseBlankValue:" + e);
         }
@@ -155,8 +148,8 @@ public class KeyValueTest {
     @Test
     public void testSessionDeath() throws Exception {
         String id = s.create("" + System.currentTimeMillis(), 2, Behavior.RELEASE, 0);
-
         assertNotNull(id);
+
         assertTrue(kv.acquireLock("key", "value", id));
 
         // When a session is destroyed the lock cannot be acquired or released during a set LockDelay in the session.
@@ -175,13 +168,16 @@ public class KeyValueTest {
 
         // Verify that a new session can create a lock.
         id = s.create("" + System.currentTimeMillis(), 2, Behavior.RELEASE, 0);
+        assertNotNull(id);
         assertTrue(kv.acquireLock("key", "value", id));
         assertTrue(kv.releaseLock("key", "value", id));
     }
 
     @Test
     public void testSessionDeathDelete() throws Exception {
-        String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 0);
+        final String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 0);
+        assertNotNull(id);
+
         assertTrue(kv.acquireLock("key", "value", id));
         s.info(id).destroy();
 
@@ -193,7 +189,8 @@ public class KeyValueTest {
 
     @Test
     public void testMultiAcquisition() throws Exception {
-        String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 0);
+        final String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 0);
+        assertNotNull(id);
         assertTrue(kv.acquireLock("key", "value", id));
         assertTrue(kv.acquireLock("key", "value", id));
         assertTrue(kv.releaseLock("key", "value", id));
@@ -201,10 +198,12 @@ public class KeyValueTest {
 
     @Test
     public void testTtl() throws Exception {
-        String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 10);
+        final String id = s.create("" + System.currentTimeMillis(), 1, Behavior.DELETE, 10);
+        assertNotNull(id);
         assertTrue(kv.acquireLock("key", "value", id));
 
         String id2 = s.create("" + System.currentTimeMillis(), 1, Behavior.RELEASE, 10);
+        assertNotNull(id2);
         assertTrue(kv.acquireLock("key2", "value", id2));
 
         // Consul doesn't guarantee a ttl to the second so we have to wait longer than 10...
