@@ -105,6 +105,49 @@ public class KeyValueTest {
         }
     }
 
+    @Test
+    public void testRelease() throws Exception {
+        String id = s.create("" + System.currentTimeMillis());
+        assertNotNull(id);
+        final String value = "value";
+        assertTrue(kv.acquireLock("key", value, id));
+        assertTrue(kv.releaseLock("key", value, id));
+        assertEquals(value, kv.get("key"));
+    }
+
+    @Test
+    public void testReleaseNullValue() throws Exception {
+        final String id = s.create("" + System.currentTimeMillis());
+        assertNotNull(id);
+        final String value = "value";
+        try {
+            assertTrue(kv.acquireLock("key", value, id));
+            assertFalse(kv.releaseLock("key", null, id));
+            assertTrue(kv.releaseLock("key", value, id));
+            assertEquals(value, kv.get("key"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("testReleaseNullValue:" + e);
+        }
+    }
+
+    @Test
+    public void testReleaseBlankValue() throws Exception {
+        final String id = s.create("" + System.currentTimeMillis());
+        assertNotNull(id);
+        final String value = "value";
+        try {
+            assertTrue(kv.acquireLock("key", value, id));
+            assertTrue(kv.releaseLock("key", "", id));
+            assertEquals("", kv.get("key"));
+        } catch (Exception e) {
+            // Hack to release the lock if it fails.
+            assertTrue(kv.releaseLock("key", value, id));
+            e.printStackTrace();
+            fail("testReleaseBlankValue:" + e);
+        }
+    }
+
     /**
      * Acquire a lock on a key, and verify that a session that is destroyed blocks the key for the session LockDelay.
      * @throws Exception
