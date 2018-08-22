@@ -13,7 +13,7 @@ public class KeyValue extends ConsulChain {
 
     public boolean set(String key, String value) throws ConsulException {
         // Give garbage, get garbage
-        if (key == null || key.trim().length() == 0) {
+        if (key == null || key.trim().length() == 0 || value == null) {
             return false;
         }
         try {
