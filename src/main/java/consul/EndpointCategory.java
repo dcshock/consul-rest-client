@@ -1,17 +1,17 @@
 package consul;
 
 public enum EndpointCategory {
-    Catalog("/v1/catalog/"),
-    Check("/v1/health/checks/"),
-    HealthService("/v1/health/service/"),
-    Agent("/v1/agent/"),
-    KV("/v1/kv/"),
-    Session("/v1/session/");
+    Catalog("/catalog"),
+    Check("/health/checks"),
+    HealthService("/health/service"),
+    Agent("/agent"),
+    KV("/kv"),
+    Session("/session");
 
     private String uri;
 
     EndpointCategory(String uri) {
-        this.uri = uri;
+        this.uri = "/v1" + uri + "/";
     }
 
     public String getUri() {

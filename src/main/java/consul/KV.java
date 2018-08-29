@@ -32,7 +32,7 @@ public class KV {
         this.lockIndex = Optional.ofNullable(obj.get("LockIndex")).map(JsonNode::asInt).orElse(0);
         this.key = Optional.ofNullable(obj.get("Key")).map(JsonNode::asText).orElse("");
         this.flags = Optional.ofNullable(obj.get("Flags")).map(JsonNode::asInt).orElse(0);
-        this.value = Optional.ofNullable(obj.get("Value")).map(JsonNode::asText).orElse("");
+        this.value = Optional.ofNullable(obj.get("Value")).map(n -> n.asText("")).orElse("");
         this.sessionId = Optional.ofNullable(obj.get("Session")).map(JsonNode::asText).orElse("");
     }
 

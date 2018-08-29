@@ -13,7 +13,7 @@ public class KeyValue extends ConsulChain {
 
     public boolean set(String key, String value) throws ConsulException {
         // Give garbage, get garbage
-        if (key == null || key.trim().length() == 0) {
+        if (key == null || key.trim().length() == 0 || value == null) {
             return false;
         }
         try {
@@ -66,26 +66,41 @@ public class KeyValue extends ConsulChain {
     }
 
     public boolean acquireLock(String key, String value, String sessionId) throws ConsulException {
-        return lock(key, value, sessionId, "acquire");
+        return lock(key, value, sessionId, LockOperation.ACQUIRE);
     }
 
     public boolean releaseLock(String key, String value, String sessionId) throws ConsulException {
-        return lock(key, value, sessionId, "release");
+        return lock(key, value, sessionId, LockOperation.RELEASE);
     }
 
-    private boolean lock(String key, String value, String sessionId, String type) throws ConsulException {
-        // Give garbage, get garbage
-        if (key == null || key.trim().length() == 0 || value == null || value.trim().length() == 0 ||
+    private enum LockOperation {
+        ACQUIRE("acquire"),
+        RELEASE("release");
+
+        private final String type;
+
+        private LockOperation(String type) {
+            this.type = type;
+        }
+
+        String type() {
+            return type;
+        }
+    }
+
+    private boolean lock(String key, String value, String sessionId, LockOperation operation) throws ConsulException {
+        // Give garbage, get garbage.  Note, we allow a blank value for value, to unset out but leave an existing value.
+        if (key == null || key.trim().length() == 0 || value == null || (operation == LockOperation.ACQUIRE && value.trim().length() == 0) ||
             sessionId == null || sessionId.trim().length() == 0) {
             return false;
         }
         try {
             // Allow the lock to be acquired multiple times.
             final KV kv = getDetails(key);
-            if (type.equals("acquire") && kv.getSessionId() != null && !kv.getSessionId().equals("")) {
+            if (operation == LockOperation.ACQUIRE && kv.getSessionId() != null && !kv.getSessionId().equals("")) {
                 return kv.getSessionId().equals(sessionId);
             }
-            final HttpResp resp = Http.put(consul().getUrl() + EndpointCategory.KV.getUri() + key + "?" + type + "=" + sessionId, value);
+            final HttpResp resp = Http.put(consul().getUrl() + EndpointCategory.KV.getUri() + key + "?" + operation.type() + "=" + sessionId, value);
             if (resp.getStatus() != Http.OK) {
                 return false;
             }
