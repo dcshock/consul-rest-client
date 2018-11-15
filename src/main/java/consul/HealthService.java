@@ -107,6 +107,12 @@ public class HealthService extends ConsulChain {
         return service;
     }
 
+    public HealthServiceCheckResponse checkDatacenter(
+                    String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService, String datacenterName
+    ) throws ConsulException {
+        return this.check(name, consulIndex, waitTimeSeconds, passing, executorService, datacenterName);
+    }
+
     HealthServiceCheckResponse check (
                     String name, String consulIndex, int waitTimeSeconds, boolean passing, ExecutorService executorService, String datacenter)
                     throws ConsulException {

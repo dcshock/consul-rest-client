@@ -116,6 +116,9 @@ consul.startup();
 
 # Release Notes
 
+### 1.3
+Allow checking specific data center. Added data center data to HealthServiceCheck. 
+
 ### 1.2 
 Allow setting a K/V value to a blank (empty) value
 
