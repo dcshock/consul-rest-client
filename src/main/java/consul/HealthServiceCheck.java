@@ -17,6 +17,7 @@ public class HealthServiceCheck {
         this.checks = new ArrayList<>(checks.size());
         this.provider.address = node.get("Node").get("Address").asText();
         this.provider.node = node.get("Node").get("Node").asText();
+        this.provider.datacenter = node.get("Node").get("Datacenter").asText();
         for(int i = 0; i < checks.size(); i++) {
             this.checks.add(new ServiceCheck(checks.get(i)));
         }

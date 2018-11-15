@@ -11,6 +11,7 @@ public class ServiceProvider {
     String node;
     String name;
     Integer port;
+    String datacenter;
     String[] tags;
     boolean critical;
 
@@ -94,9 +95,17 @@ public class ServiceProvider {
         return critical;
     }
 
+    public void setDatacenter(String datacenter) {
+        this.datacenter = datacenter;
+    }
+
+    public String getDatacenter() {
+        return datacenter;
+    }
+
     @Override
     public String toString() {
         return "ServiceProvider [id=" + id + ", address=" + address + ", node=" + node + ", name=" + name + ", port=" + port +
-                        ", tags=" + Arrays.toString(tags) + ", critical=" + critical + "]";
+                        ", datacenter=" + datacenter + ", tags=" + Arrays.toString(tags) + ", critical=" + critical + "]";
     }
 }
