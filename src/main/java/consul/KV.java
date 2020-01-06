@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Optional;
 
 public class KV {
-    Integer createIndex;
-    Integer modifyIndex;
-    Integer lockIndex;
+    String createIndex;
+    String modifyIndex;
+    String lockIndex;
     String key;
     Integer flags;
     String value;
@@ -16,7 +16,7 @@ public class KV {
     public KV() {
     }
 
-    public KV(Integer createIndex, Integer modifyIndex, Integer lockIndex, String key, Integer flags, String value, String sessionId) {
+    public KV(String createIndex, String modifyIndex, String lockIndex, String key, Integer flags, String value, String sessionId) {
         this.createIndex = createIndex;
         this.modifyIndex = modifyIndex;
         this.lockIndex = lockIndex;
@@ -27,32 +27,32 @@ public class KV {
     }
 
     KV(JsonNode obj) {
-        this.createIndex = Optional.ofNullable(obj.get("CreateIndex")).map(JsonNode::asInt).orElse(0);
-        this.modifyIndex = Optional.ofNullable(obj.get("ModifyIndex")).map(JsonNode::asInt).orElse(0);
-        this.lockIndex = Optional.ofNullable(obj.get("LockIndex")).map(JsonNode::asInt).orElse(0);
+        this.createIndex = Optional.ofNullable(obj.get("CreateIndex")).map(JsonNode::asText).orElse("");
+        this.modifyIndex = Optional.ofNullable(obj.get("ModifyIndex")).map(JsonNode::asText).orElse("");
+        this.lockIndex = Optional.ofNullable(obj.get("LockIndex")).map(JsonNode::asText).orElse("");
         this.key = Optional.ofNullable(obj.get("Key")).map(JsonNode::asText).orElse("");
         this.flags = Optional.ofNullable(obj.get("Flags")).map(JsonNode::asInt).orElse(0);
         this.value = Optional.ofNullable(obj.get("Value")).map(n -> n.asText("")).orElse("");
         this.sessionId = Optional.ofNullable(obj.get("Session")).map(JsonNode::asText).orElse("");
     }
 
-    public Integer getCreateIndex() {
+    public String getCreateIndex() {
         return createIndex;
     }
 
-    public void setCreateIndex(Integer createIndex) {
+    public void setCreateIndex(String createIndex) {
         this.createIndex = createIndex;
     }
 
-    public Integer getModifyIndex() {
+    public String getModifyIndex() {
         return modifyIndex;
     }
 
-    public void setModifyIndex(Integer modifyIndex) {
+    public void setModifyIndex(String modifyIndex) {
         this.modifyIndex = modifyIndex;
     }
 
-    public Integer getLockIndex() {
+    public String getLockIndex() {
         return lockIndex;
     }
 
@@ -60,7 +60,7 @@ public class KV {
         return sessionId;
     }
 
-    public void setLockIndex(Integer lockIndex) {
+    public void setLockIndex(String lockIndex) {
         this.lockIndex = lockIndex;
     }
 
